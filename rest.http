@@ -1,0 +1,29 @@
+###
+POST http://localhost:8000/api-v1/user/register
+Content-Type: application/json
+
+{
+    "firstName": "Ban",
+    "lastName": "Tran",
+    "email": "TrannhatBan4@gmail.com",
+    "password": "abc123"
+}
+
+###
+POST http://localhost:8000/api-v1/user/login
+Content-Type: application/json
+
+{
+    "email": "TrannhatBan4@gmail.com",
+    "password": "abc123"
+}
+###
+
+GET  http://localhost:8000/api-v1/user/list-users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2M2ViMTI5ZWI5NmZmYmQ1NTUwZjYyNzciLCJpYXQiOjE2NzYzNjE1NDMsImV4cCI6MTY3NjM2MTYwM30.5GlD7V2D_c0fmGY_wrSj1x6sjIvMidRKSfzk7kG-hx8
+
+###
+POST http://localhost:8000/user/refresh-token
+
+###
+POST http://localhost:8000/user/logout
