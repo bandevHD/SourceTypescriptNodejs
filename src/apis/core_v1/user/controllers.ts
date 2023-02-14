@@ -1,4 +1,4 @@
-import { register, login, getList } from './services';
+import { register, login, getList, registerTypeORM } from './services';
 import { Request, Response } from 'express';
 
 export async function registerController(req: Request, res: Response) {
@@ -11,6 +11,11 @@ export async function loginController(req: Request, res: Response) {
 
 export async function getListUserController(req: Request, res: Response) {
   return await getList(req, res);
+}
+
+
+export async function registerControllerTypeOrm(req: Request, res: Response) {
+  return await registerTypeORM(req, res);
 }
 
 // class UserController {

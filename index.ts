@@ -1,3 +1,4 @@
+require('reflect-metadata');
 import express from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
@@ -13,6 +14,7 @@ import YAML from 'yamljs';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import fs = require('fs');
+import { myDataSource } from './src/config/conenctTypeORM';
 
 const key1 = crypto.randomBytes(32).toString('hex');
 const key2 = crypto.randomBytes(32).toString('hex');
@@ -35,22 +37,21 @@ app.use(express.json());
 // app.use(bodyParser({ extended: false }));
 app.use(bodyParser.json());
 
-dbConnect();
+// dbConnect();
+
+myDataSource
+  .initialize()
+  .then(() => {
+    console.log('Data Source has been initialized!');
+  })
+  .catch((err) => {
+    console.error('Error during Data Source initialization:', err);
+  });
 
 const swaggerFile = process.cwd() + '/swagger/swagger.json';
 const swaggerData = fs.readFileSync(swaggerFile, 'utf8');
 const swaggerDocument = JSON.parse(swaggerData);
-
-// const document_swagger_v1 = `./swagger/swagger.v1.yml`;
-
-// const swaggerDocumentV1 = YAML.load(path.resolve(__dirname, document_swagger_v1));
-
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-// app.use(
-//   '/api-v1/docs',
-//   swaggerUi.serveFiles(swaggerDocumentV1),
-//   swaggerUi.setup(swaggerDocumentV1),
-// );
 
 app.use('/api-v1', apiCoreV1);
 //handle error internal server

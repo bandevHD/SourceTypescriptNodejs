@@ -10,3 +10,8 @@
 - [x] npm run build
 - [x] Open terminal: npm run dev
 - [x] Success !
+
+## How to migration with TypeORM
+- [x] typeorm migration:create ./path-to-migrations-dir/nameFile
+- [x] typeorm migration:run -- -d path-to-datasource-config
+- [x] Success !

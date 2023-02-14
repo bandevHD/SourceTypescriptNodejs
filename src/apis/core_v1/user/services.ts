@@ -108,6 +108,42 @@ export async function getList(req: Request, res: Response) {
     console.log(error);
   }
 }
+
+export async function registerTypeORM(req: Request, res: Response) {
+  try {
+    const { firstName, lastName, email, password } = req.body;
+    const { error } = await userValidate(req.body);
+
+    if (error) {
+      throw createError(error.details[0].message);
+    }
+
+    const isExits = await User.findOne({ email });
+
+    if (isExits) {
+      return res.json({
+        status: 400,
+        message: createError.Conflict(`${email} is ready has been register`).message,
+      });
+    }
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password,
+    });
+
+    const saveUser = await user.save();
+
+    return res.json({
+      status: 200,
+      data: saveUser,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 // class UserService {
 //   // constructor() {}
 //   userRegister = (req: Request, res: Response) => {
