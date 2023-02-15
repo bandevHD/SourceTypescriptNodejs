@@ -26,4 +26,47 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2M2ViM
 POST http://localhost:8000/user/refresh-token
 
 ###
-POST http://localhost:8000/user/logout
+DELETE http://localhost:8000/user/logout
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhMjE4ZDkyOC04OWQzLTRjYzAtOWFmYi01OTVkYTczYjVlNDMiLCJpYXQiOjE2NzY0NDgzMDgsImV4cCI6MTcwODAwNTkwOH0.et7LTmSwB48-MsbSU_KtqvH87dFMUC14Pfc-QpBigr8"
+}
+
+###Regiter typeom mysql
+POST http://localhost:8000/api-v1/user/register-typeorm
+Content-Type: application/json
+
+{
+    "firstName": "Bản",
+    "lastName": "Tran",
+    "email": "bant8233@gmail.com",
+    "password": "abc123"
+}
+
+###Login typeom mysql
+POST http://localhost:8000/api-v1/user/login-typeorm
+Content-Type: application/json
+
+{
+    "email": "bant82@gmail.com",
+    "password": "abc123",
+    "hack": "true"
+}
+
+###Refresh token typeom mysql
+POST http://localhost:8000/api-v1/user/refresh-token-typeorm
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhMjE4ZDkyOC04OWQzLTRjYzAtOWFmYi01OTVkYTczYjVlNDMiLCJpYXQiOjE2NzY0NTEzNzksImV4cCI6MTcwODAwODk3OX0.r5ta4I7K35leeCUosKF3f6tHLXnKs8lTzHBwTfOlaj8"
+}
+
+###
+
+DELETE http://localhost:8000/api-v1/user/logout-typeorm
+Content-Type: application/json
+
+{
+     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhMjE4ZDkyOC04OWQzLTRjYzAtOWFmYi01OTVkYTczYjVlNDMiLCJpYXQiOjE2NzY0NTE1MDcsImV4cCI6MTcwODAwOTEwN30.IiKy-qUjCJRaYKkLtOFWnviPPOrGg1_3uN6_B9f4QqI"
+}

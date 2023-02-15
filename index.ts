@@ -1,23 +1,26 @@
 require('reflect-metadata');
+require('express-async-errors');
 import express from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 // import helmet from 'helmet';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-require('express-async-errors');
 import apiCoreV1 from './src/apis/core_v1/routers/router';
-import dbConnect from './src/config/connectMongoDb';
+
 import { StatusCodes } from 'http-status-codes';
-import crypto from 'crypto';
-import YAML from 'yamljs';
-import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import fs = require('fs');
 import { myDataSource } from './src/config/conenctTypeORM';
+import redis from './src/config/connectRedis';
+import dbConnect from './src/config/connectMongoDb';
 
-const key1 = crypto.randomBytes(32).toString('hex');
-const key2 = crypto.randomBytes(32).toString('hex');
+// import crypto from 'crypto';
+// import YAML from 'yamljs';
+// import path from 'path';
+
+// const key1 = crypto.randomBytes(32).toString('hex');
+// const key2 = crypto.randomBytes(32).toString('hex');
 
 // console.table({ key1, key2 });
 

@@ -1,9 +1,10 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "This is a simple example NodeJS API project to demonstrate Swagger Documentation",
+    "title": "API Document",
+    "description": "API Document",
+    "termsOfService": "http://sewagger.io/terms/",
     "version": "1.0.0",
-    "title": "Tasks API",
     "contact": {
       "email": "trannhatban34@gmail.com"
     },
@@ -12,9 +13,78 @@
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  },
+  "servers": {
+    "url": "http://localhost:8000/api-v1",
+    "description": "development"
+  },
   "schemes": ["http"],
   "host": "localhost:8000",
   "basePath": "/api-v1",
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "REGISTER_USER": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "LOGIN_USER": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "REFRESH_TOKEN_USER": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          }
+        }
+      },
+      "LOGOUT_USER": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
   "paths": {
     "/user/register": {
       "post": {
@@ -22,6 +92,7 @@
         "description": "User register",
         "produces": ["application/json"],
         "consumes": ["application/json"],
+        "tags": ["User-MONGOOSE"],
         "parameters": [
           {
             "in": "body",
@@ -29,21 +100,7 @@
             "description": "Register",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "firstName": {
-                  "type": "string"
-                },
-                "lastName": {
-                  "type": "string"
-                },
-                "email": {
-                  "type": "string"
-                },
-                "password": {
-                  "type": "string"
-                }
-              }
+              "$ref": "#/components/schemas/REGISTER_USER"
             }
           }
         ],
@@ -99,6 +156,7 @@
         "description": "User login",
         "produces": ["application/json"],
         "consumes": ["application/json"],
+        "tags": ["User-MONGOOSE"],
         "parameters": [
           {
             "in": "body",
@@ -106,15 +164,7 @@
             "description": "Login",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "type": "string"
-                },
-                "password": {
-                  "type": "string"
-                }
-              }
+              "$ref": "#/components/schemas/LOGIN_USER"
             }
           }
         ],
@@ -170,6 +220,265 @@
         "description": "Get list user",
         "produces": ["application/json"],
         "parameters": [],
+        "tags": ["User-MONGOOSE"],
+        "responses": {
+          "400": {
+            "description": "Invalid status value",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Login Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+
+    "/user/register-typeorm": {
+      "post": {
+        "summary": "User register with TypeORM",
+        "description": "User register with TypeORM",
+        "produces": ["application/json"],
+        "consumes": ["application/json"],
+        "tags": ["User-TypeORM"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Register",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/REGISTER_USER"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid status value",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Register Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/login-typeorm": {
+      "post": {
+        "summary": "User login with TypeORM",
+        "description": "User login with TypeORM",
+        "produces": ["application/json"],
+        "consumes": ["application/json"],
+        "tags": ["User-TypeORM"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Login",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/LOGIN_USER"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid status value",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Login Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/refresh-token-typeorm": {
+      "post": {
+        "summary": "User use refresh token typeorm",
+        "description": "User use refresh token typeorm",
+        "produces": ["application/json"],
+        "consumes": ["application/json"],
+        "tags": ["User-TypeORM"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Login",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/REFRESH_TOKEN_USER"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid status value",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Login Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/logout-typeorm": {
+      "delete": {
+        "summary": "User use logout",
+        "description": "User use logout",
+        "produces": ["application/json"],
+        "consumes": ["application/json"],
+        "tags": ["User-TypeORM"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Login",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/LOGOUT_USER"
+            }
+          }
+        ],
         "responses": {
           "400": {
             "description": "Invalid status value",

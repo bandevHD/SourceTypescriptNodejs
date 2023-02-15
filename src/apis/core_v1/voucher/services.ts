@@ -208,4 +208,12 @@ export default class UserService implements IUserService {
       message: 'Logout',
     };
   };
+
+  //Restful APIs
+  createUser = async (createUserType: CreateUserType) => {
+    const password: string = await hashPassword(createUserType.password);
+    const newUser: User = this.userReposity.create({ ...createUserType, password });
+    const saveUser: User = await this.userReposity.save(newUser);
+    return { statusCode: 200, data: saveUser.id };
+  };
 }
