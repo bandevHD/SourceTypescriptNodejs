@@ -38,9 +38,9 @@ POST http://localhost:8000/api-v1/user/register-typeorm
 Content-Type: application/json
 
 {
-    "firstName": "Bản",
+    "firstName": "Bảng",
     "lastName": "Tran",
-    "email": "bant8233@gmail.com",
+    "email": "bant833@gmail.com",
     "password": "abc123"
 }
 
@@ -70,3 +70,54 @@ Content-Type: application/json
 {
      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhMjE4ZDkyOC04OWQzLTRjYzAtOWFmYi01OTVkYTczYjVlNDMiLCJpYXQiOjE2NzY0NTE1MDcsImV4cCI6MTcwODAwOTEwN30.IiKy-qUjCJRaYKkLtOFWnviPPOrGg1_3uN6_B9f4QqI"
 }
+
+###RESTFUL api
+
+POST http://localhost:8000/api-v1/voucher/create-voucher
+Content-Type: application/json
+
+{
+    "title": "Giam gia khuyen mai",
+    "content": "Ok",
+    "description": "Ok",
+    "discount": "1233",
+    "quantity": 12,
+    "startTimeAt": "16-02-2023 10:23",
+    "endTimeAt": "16-02-2023 23:23",
+    "isInactive": "true",
+    "isDelete": "false",
+    "hackchetmema": "Ok"
+}
+
+###
+GET http://localhost:8000/api-v1/voucher/read-list-voucher
+
+###
+GET http://localhost:8000/api-v1/voucher/read-one-voucher/1bcac2be-fde7-4e74-bb44-89fc2f50e85b
+
+###
+PUT http://localhost:8000/api-v1/voucher/update-voucher/
+Content-Type: application/json
+
+{
+    "id": "1bcac2be-fde7-4e74-bb44-89fc2f50e85b",
+    "title": "Giam gia khuyen mai ngày 16-2-2023",
+    "content": "Ok",
+    "description": "Ok",
+    "discount": 1233,
+    "quantity": 12,
+    "startTimeAt": "16-02-2023 10:23",
+    "endTimeAt": "16-02-2023 23:23",
+    "isInactive": "false",
+    "isDelete": "false"
+}
+
+###
+DELETE http://localhost:8000/api-v1/voucher/delete-voucher/
+Content-Type: application/json
+
+{
+    "id": "1bcac2be-fde7-4e74-bb44-89fc2f50e85b"
+}
+
+

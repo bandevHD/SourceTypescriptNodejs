@@ -1,5 +1,5 @@
 import userRouter from './user.router';
-import voucherRouter from './user.router';
+import voucherRouter from './voucher.router';
 import { Router } from 'express';
 
 const baseRouter: any = Router();

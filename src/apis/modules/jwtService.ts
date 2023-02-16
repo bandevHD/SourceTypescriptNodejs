@@ -17,7 +17,7 @@ export async function hashPassword(password: string): Promise<string> {
   }
 }
 
-export async function verifyRefreshToken(refreshToken: string) {
+export async function verifyRefreshToken(refreshToken: string): Promise<string> {
   try {
     return new Promise((resolve, reject) => {
       const { JWT_KEY_REFRESH_TOKEN } = process.env;
@@ -26,7 +26,7 @@ export async function verifyRefreshToken(refreshToken: string) {
         if (err) return reject(err);
         await client.get(payload.userId).then((result: string) => {
           if (refreshToken === result) {
-            return resolve(payload);
+            return resolve(payload.userId);
           }
         });
         return reject(createError.Unauthorized());

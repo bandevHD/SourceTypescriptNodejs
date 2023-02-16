@@ -76,6 +76,79 @@
             "type": "string"
           }
         }
+      },
+      "CREATE_VOUCHER": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "discount": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "startTimeAt": {
+            "type": "string"
+          },
+          "endTimeAt": {
+            "type": "string"
+          },
+          "isInactive": {
+            "type": "string"
+          },
+          "isDelete": {
+            "type": "string"
+          }
+        }
+      },
+      "UPDATE_VOUCHER": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "discount": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "startTimeAt": {
+            "type": "string"
+          },
+          "endTimeAt": {
+            "type": "string"
+          },
+          "isInactive": {
+            "type": "string"
+          },
+          "isDelete": {
+            "type": "string"
+          }
+        }
+      },
+      "DELETE_VOUCHER": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
       }
     }
   },
@@ -267,7 +340,6 @@
         }
       }
     },
-
 
     "/user/register-typeorm": {
       "post": {
@@ -496,6 +568,379 @@
           },
           "200": {
             "description": "Login Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/voucher/create-voucher": {
+      "post": {
+        "summary": "Create voucher",
+        "description": "Create with TypeORM",
+        "produces": ["application/json"],
+        "consumes": ["application/json"],
+        "tags": ["Voucher"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Create",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CREATE_VOUCHER"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid status value",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Create voucher Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voucher/update-voucher": {
+      "put": {
+        "summary": "Update voucher",
+        "description": "Update voucher with TypeORM",
+        "produces": ["application/json"],
+        "consumes": ["application/json"],
+        "tags": ["Voucher"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Update",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UPDATE_VOUCHER"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid status value",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Update Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update voucher one source",
+        "description": "Update voucher one source",
+        "produces": ["application/json"],
+        "consumes": ["application/json"],
+        "tags": ["Voucher"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Update",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/REFRESH_TOKEN_USER"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid status value",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Update Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voucher/read-list-voucher": {
+      "get": {
+        "summary": "Read list voucher",
+        "description": "Read list voucher",
+        "produces": ["application/json"],
+        "consumes": ["application/json"],
+        "tags": ["Voucher"],
+        "parameters": [],
+        "responses": {
+          "400": {
+            "description": "Invalid status value",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Get List Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voucher/read-one-voucher/{id}": {
+      "get": {
+        "summary": "Read list voucher",
+        "description": "Read list voucher",
+        "produces": ["application/json"],
+        "consumes": ["application/json"],
+        "tags": ["Voucher"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Get one voucher",
+            "required": true,
+            "schema": {
+              "type": "string | number"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid status value",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Get One Voucher Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voucher/delete-voucher": {
+      "delete": {
+        "summary": "Delete voucher",
+        "description": "Delete voucher",
+        "produces": ["application/json"],
+        "consumes": ["application/json"],
+        "tags": ["Voucher"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Delete one voucher",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/DELETE_VOUCHER"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid status value",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Delete Success",
             "schema": {
               "type": "object",
               "properties": {

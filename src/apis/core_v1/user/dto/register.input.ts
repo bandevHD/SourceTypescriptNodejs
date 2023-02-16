@@ -8,7 +8,6 @@ export const userValidate = (data) => {
     email: Joi.string().email().lowercase().required(),
     password: Joi.string().min(4).max(32).required(),
   });
-
   return userSchema.validate(data);
 };
 

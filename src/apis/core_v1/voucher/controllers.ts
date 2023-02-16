@@ -1,15 +1,25 @@
-import UserService from './services';
+import VoucherService from './services';
 import { NextFunction, Request, Response } from 'express';
-import IUserService from '../../../utils/interface';
+import { createValidate } from './dto/create.input';
+import { createVoucher } from '../../../utils/constant';
+import * as _ from 'lodash';
+import { updatePutValidate } from './dto/updatePut.input';
 
 class VoucherController {
-  userservice: IUserService;
+  voucherservice;
   constructor() {
-    this.userservice = new UserService();
+    this.voucherservice = new VoucherService();
   }
   createController = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.userservice.register(req.body);
+      const isValid: string = createValidate(req.body);
+      if (isValid)
+        res.status(422).json({
+          statusCode: 422,
+          message: isValid ? isValid : '',
+        });
+      const body: object = _.pick(req.body, createVoucher);
+      const result = await this.voucherservice.createVoucher(body);
       if (!result.data) res.status(parseInt(result.statusCode));
       res.json({
         statusCode: result.statusCode,
@@ -22,8 +32,18 @@ class VoucherController {
 
   updatePutController = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.userservice.loginUser(req.body);
-      if (!result.data) res.status(parseInt(result.statusCode));
+      const { id } = req.body;
+      const isValid: string = updatePutValidate(req.body);
+      if (isValid)
+        res.status(422).json({
+          statusCode: 422,
+          message: isValid ? isValid : '',
+        });
+      const result = await this.voucherservice.updatePutVoucher({ id }, req.body);
+      if (!result.data) {
+        res.status(parseInt(result.statusCode));
+        return;
+      }
       res.json({
         statusCode: result.statusCode,
         message: result.message ? result.message : '',
@@ -36,7 +56,7 @@ class VoucherController {
 
   updatePathController = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.userservice.refreshToken(req.body);
+      const result = await this.voucherservice.refreshToken(req.body);
       if (!result.data) res.status(parseInt(result.statusCode));
       res.json({
         statusCode: result.statusCode,
@@ -50,7 +70,7 @@ class VoucherController {
 
   readListController = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.userservice.logout(req.body);
+      const result = await this.voucherservice.readListVoucher();
       if (!result.data) res.status(parseInt(result.statusCode));
       res.json({
         statusCode: result.statusCode,
@@ -64,12 +84,13 @@ class VoucherController {
 
   readOneController = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // const result = await this.userservice.createUser(req.body);
-      // if (!result.data) res.status(parseInt(result.statusCode));
-      // res.json({
-      //   statusCode: result.statusCode,
-      //   data: result.data ? result.data : null,
-      // });
+      const { id } = req.params;
+      const result = await this.voucherservice.readOneVoucher({ id });
+      if (!result.data) res.status(parseInt(result.statusCode));
+      res.json({
+        statusCode: result.statusCode,
+        data: result.data ? result.data : null,
+      });
     } catch (error) {
       next(error);
     }
@@ -77,12 +98,13 @@ class VoucherController {
 
   deleteController = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // const result = await this.userservice.createUser(req.body);
-      // if (!result.data) res.status(parseInt(result.statusCode));
-      // res.json({
-      //   statusCode: result.statusCode,
-      //   data: result.data ? result.data : null,
-      // });
+      const isDelete = true;
+      const result = await this.voucherservice.deleteVoucher(req.body, { isDelete });
+      if (!result.data) res.status(parseInt(result.statusCode));
+      res.json({
+        statusCode: result.statusCode,
+        data: result.data ? result.data : null,
+      });
     } catch (error) {
       next(error);
     }

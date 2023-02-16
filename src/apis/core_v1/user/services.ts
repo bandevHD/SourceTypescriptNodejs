@@ -174,7 +174,7 @@ export default class UserService implements IUserService {
         message: createError.BadRequest(`Refresh token is not correct`).message,
       };
 
-    const { userId } = await verifyRefreshToken(refreshToken);
+    const userId: string = await verifyRefreshToken(refreshToken);
 
     const accessToken: string = await signJwt(userId);
     const refreshTokenResult: string = await signJwtRefreshToken(userId);
@@ -200,7 +200,7 @@ export default class UserService implements IUserService {
         message: createError.BadRequest(`Refresh token is not correct`).message,
       };
 
-    const { userId } = await verifyRefreshToken(refreshToken);
+    const userId: string = await verifyRefreshToken(refreshToken);
 
     redis.del(userId);
     return {
