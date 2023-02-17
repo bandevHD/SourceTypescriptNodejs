@@ -1,30 +1,13 @@
 import Joi from 'joi';
-import { IsEmail, IsNotEmpty, MaxLength } from 'class-validator';
 
-export const userValidate = (data) => {
+export const resgiterValidate = (data: object) => {
   const userSchema = Joi.object({
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
     email: Joi.string().email().lowercase().required(),
     password: Joi.string().min(4).max(32).required(),
   });
-  return userSchema.validate(data);
+  const { error } = userSchema.validate(data);
+  if (!error) return;
+  return error.details[0].message;
 };
-
-export class CreateUserDto {
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @IsNotEmpty()
-  @MaxLength(32)
-  firstName: string;
-
-  @IsNotEmpty()
-  @MaxLength(32)
-  lastName: string;
-
-  @IsNotEmpty()
-  @MaxLength(32)
-  password: string;
-}

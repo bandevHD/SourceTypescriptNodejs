@@ -310,7 +310,151 @@
             }
           },
           "200": {
-            "description": "Login Success",
+            "description": "Get list user Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/refresh-token": {
+      "post": {
+        "summary": "User refresh token",
+        "description": "User refresh token",
+        "produces": ["application/json"],
+        "consumes": ["application/json"],
+        "tags": ["User-MONGOOSE"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Login",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "refreshToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid status value",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Refresh token Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/logout": {
+      "delete": {
+        "summary": "User use logout",
+        "description": "User use logout",
+        "produces": ["application/json"],
+        "consumes": ["application/json"],
+        "tags": ["User-MONGOOSE"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Login",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "refreshToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid status value",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Logut Success",
             "schema": {
               "type": "object",
               "properties": {
@@ -568,6 +712,59 @@
           },
           "200": {
             "description": "Login Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/list-users-typeorm": {
+      "get": {
+        "summary": "Get list user",
+        "description": "Get list user",
+        "produces": ["application/json"],
+        "parameters": [],
+        "tags": ["User-TypeORM"],
+        "responses": {
+          "400": {
+            "description": "Invalid status value",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "messageCode": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Get list Success",
             "schema": {
               "type": "object",
               "properties": {

@@ -29,18 +29,18 @@ dotenv.config();
 const app = express();
 app.use(morgan('common'));
 app.enable('trust proxy');
-app.use(
-  cors({
-    orgin: '*',
-  }),
-);
+// app.use(
+//   cors({
+//     orgin: '*',
+//   }),
+// );
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // app.use(bodyParser({ extended: false }));
 app.use(bodyParser.json());
 
-// dbConnect();
+dbConnect();
 
 myDataSource
   .initialize()

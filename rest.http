@@ -5,7 +5,7 @@ Content-Type: application/json
 {
     "firstName": "Ban",
     "lastName": "Tran",
-    "email": "TrannhatBan4@gmail.com",
+    "email": "TrannhatBan4123@gmail.com",
     "password": "abc123"
 }
 
@@ -14,23 +14,28 @@ POST http://localhost:8000/api-v1/user/login
 Content-Type: application/json
 
 {
-    "email": "TrannhatBan4@gmail.com",
+    "email": "TrannhatBan4123@gmail.com",
     "password": "abc123"
 }
 ###
 
 GET  http://localhost:8000/api-v1/user/list-users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2M2ViMTI5ZWI5NmZmYmQ1NTUwZjYyNzciLCJpYXQiOjE2NzYzNjE1NDMsImV4cCI6MTY3NjM2MTYwM30.5GlD7V2D_c0fmGY_wrSj1x6sjIvMidRKSfzk7kG-hx8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2M2VlZTVlOWI3NDFjYTRiNTJiY2I5YzciLCJpYXQiOjE2NzY2MDA5MDEsImV4cCI6MTY3NjYwMTgwMX0.NYbGzTrc0K0sCv1Zqpi-MyyZbZV9-Do802eFzLR0Zf0
 
 ###
-POST http://localhost:8000/user/refresh-token
-
-###
-DELETE http://localhost:8000/user/logout
+POST http://localhost:8000/api-v1/user/refresh-token
 Content-Type: application/json
 
 {
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhMjE4ZDkyOC04OWQzLTRjYzAtOWFmYi01OTVkYTczYjVlNDMiLCJpYXQiOjE2NzY0NDgzMDgsImV4cCI6MTcwODAwNTkwOH0.et7LTmSwB48-MsbSU_KtqvH87dFMUC14Pfc-QpBigr8"
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2M2ViMTI5ZWI5NmZmYmQ1NTUwZjYyNzciLCJpYXQiOjE2NzY1OTkxOTMsImV4cCI6MTcwODE1Njc5M30.DVEYrmAWYvQoKSSUCQVxCUfMQAK-Brbf7twxoW__dpQ"
+}
+
+###
+DELETE http://localhost:8000/api-v1/user/logout
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2M2VlZTVlOWI3NDFjYTRiNTJiY2I5YzciLCJpYXQiOjE2NzY2MDM2MTQsImV4cCI6MTcwODE2MTIxNH0.B63w8InZVoJdkUXnt2QpUj3eWMHboqgXAjFCwB8kOiQ"
 }
 
 ###Regiter typeom mysql
@@ -38,9 +43,9 @@ POST http://localhost:8000/api-v1/user/register-typeorm
 Content-Type: application/json
 
 {
-    "firstName": "Bảng",
-    "lastName": "Tran",
-    "email": "bant833@gmail.com",
+    "firstName": "Trần",
+    "lastName": "A",
+    "email": "tranA@gmail.com",
     "password": "abc123"
 }
 
@@ -49,9 +54,8 @@ POST http://localhost:8000/api-v1/user/login-typeorm
 Content-Type: application/json
 
 {
-    "email": "bant82@gmail.com",
-    "password": "abc123",
-    "hack": "true"
+    "email": "tranA@gmail.com",
+    "password": "abc123"
 }
 
 ###Refresh token typeom mysql
@@ -59,20 +63,22 @@ POST http://localhost:8000/api-v1/user/refresh-token-typeorm
 Content-Type: application/json
 
 {
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhMjE4ZDkyOC04OWQzLTRjYzAtOWFmYi01OTVkYTczYjVlNDMiLCJpYXQiOjE2NzY0NTEzNzksImV4cCI6MTcwODAwODk3OX0.r5ta4I7K35leeCUosKF3f6tHLXnKs8lTzHBwTfOlaj8"
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5YWFlZmI2Mi02MDBjLTQxMTctOGZmYi04YTZhNjZlMGE4M2YiLCJpYXQiOjE2NzY2MDIwOTYsImV4cCI6MTcwODE1OTY5Nn0.GfDo2lrW93wEovniFdOQ9iZ8Mgs1dqdBXRMxMYD87tU"
 }
 
-###
-
+###Logout typeom mysql
 DELETE http://localhost:8000/api-v1/user/logout-typeorm
 Content-Type: application/json
 
 {
-     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhMjE4ZDkyOC04OWQzLTRjYzAtOWFmYi01OTVkYTczYjVlNDMiLCJpYXQiOjE2NzY0NTE1MDcsImV4cCI6MTcwODAwOTEwN30.IiKy-qUjCJRaYKkLtOFWnviPPOrGg1_3uN6_B9f4QqI"
+     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5YWFlZmI2Mi02MDBjLTQxMTctOGZmYi04YTZhNjZlMGE4M2YiLCJpYXQiOjE2NzY2MDIxMjIsImV4cCI6MTcwODE1OTcyMn0.JF0ANlwnCYn3Yg-2X9GpwiEwz4pIjABCCqpop40Kdm4"
 }
 
-###RESTFUL api
+###Get list user typeorm mysql
+GET http://localhost:8000/api-v1/user/list-users-typeorm
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5YWFlZmI2Mi02MDBjLTQxMTctOGZmYi04YTZhNjZlMGE4M2YiLCJpYXQiOjE2NzY2MDI3MTAsImV4cCI6MTY3NjYwMzYxMH0.pRpgTLnXBTWfAXBCYFTtBtXe_1SGy_2_py4LvTi_sPQ
 
+###RESTFUL api
 POST http://localhost:8000/api-v1/voucher/create-voucher
 Content-Type: application/json
 

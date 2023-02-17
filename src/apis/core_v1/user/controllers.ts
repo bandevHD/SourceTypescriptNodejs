@@ -1,20 +1,23 @@
-import { register, login, getList } from './services';
+import { register, login, getList, refreshToken, logout } from './services';
 import UserService from './services';
 import { NextFunction, Request, Response } from 'express';
 import IUserService from '../../../utils/interface';
 import * as _ from 'lodash';
 
-export async function registerController(req: Request, res: Response) {
-  return await register(req, res);
-}
+export const registerController = async (req: Request, res: Response, next: NextFunction) =>
+  await register(req, res, next);
 
-export async function loginController(req: Request, res: Response) {
-  return await login(req, res);
-}
+export const loginController = async (req: Request, res: Response, next: NextFunction) =>
+  await login(req, res, next);
 
-export async function getListUserController(req: Request, res: Response) {
-  return await getList(req, res);
-}
+export const getListUserController = async (req: Request, res: Response, next: NextFunction) =>
+  await getList(req, res, next);
+
+export const refreshTokenController = async (req: Request, res: Response, next: NextFunction) =>
+  await refreshToken(req, res, next);
+
+export const logoutController = async (req: Request, res: Response, next: NextFunction) =>
+  await logout(req, res, next);
 
 class UserController {
   userservice: IUserService;
@@ -27,6 +30,7 @@ class UserController {
       if (!result.data) res.status(parseInt(result.statusCode));
       res.json({
         statusCode: result.statusCode,
+        message: result.message ? result.message : '',
         data: result.data ? result.data : null,
       });
     } catch (error) {
@@ -66,6 +70,20 @@ class UserController {
   logout = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await this.userservice.logout(req.body);
+      if (!result.data) res.status(parseInt(result.statusCode));
+      res.json({
+        statusCode: result.statusCode,
+        message: result.message ? result.message : '',
+        data: result.data ? result.data : '',
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getListUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await this.userservice.findUser();
       if (!result.data) res.status(parseInt(result.statusCode));
       res.json({
         statusCode: result.statusCode,

@@ -5,5 +5,5 @@ export default interface IUserService {
   loginUser(loginUserType: LoginUserType);
   refreshToken(refreshTokenType: RefreshTokenType);
   logout(logoutType: LogoutType);
-  findUser(findUserType: FindUserType): Promise<User>;
+  findUser();
 }

@@ -1,9 +1,7 @@
 import Joi from 'joi';
-
-export const userLoginValidate = (data: object) => {
+export const logoutValidate = (data: object) => {
   const userSchema = Joi.object({
-    email: Joi.string().email().lowercase().required(),
-    password: Joi.string().min(4).max(32).required(),
+    refreshToken: Joi.string().required(),
   });
 
   const { error } = userSchema.validate(data);

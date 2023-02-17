@@ -14,14 +14,14 @@ class VoucherController {
     try {
       const isValid: string = createValidate(req.body);
       if (isValid)
-        res.status(422).json({
+        return res.status(422).json({
           statusCode: 422,
           message: isValid ? isValid : '',
         });
       const body: object = _.pick(req.body, createVoucher);
       const result = await this.voucherservice.createVoucher(body);
       if (!result.data) res.status(parseInt(result.statusCode));
-      res.json({
+      return res.json({
         statusCode: result.statusCode,
         data: result.data ? result.data : null,
       });

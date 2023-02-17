@@ -10,23 +10,23 @@ dotenv.config();
 export async function hashPassword(password: string): Promise<string> {
   try {
     const salt: string = await bcrypt.genSalt(10);
-    const hashPassword = await bcrypt.hash(password, salt);
+    const hashPassword: string = await bcrypt.hash(password, salt);
     return hashPassword;
   } catch (error) {
-    console.log(error);
+    throw new Error(error);
   }
 }
 
-export async function verifyRefreshToken(refreshToken: string): Promise<string> {
+export async function verifyRefreshToken(refreshToken: string): Promise<JWT.JwtPayload> {
   try {
     return new Promise((resolve, reject) => {
       const { JWT_KEY_REFRESH_TOKEN } = process.env;
       const secret: string = JWT_KEY_REFRESH_TOKEN;
-      JWT.verify(refreshToken, secret, async (err, payload: any) => {
+      JWT.verify(refreshToken, secret, async (err, payload: JWT.JwtPayload) => {
         if (err) return reject(err);
         await client.get(payload.userId).then((result: string) => {
-          if (refreshToken === result) {
-            return resolve(payload.userId);
+          if (refreshToken == result) {
+            return resolve(payload);
           }
         });
         return reject(createError.Unauthorized());
@@ -42,10 +42,10 @@ export async function verifyToken(req, res: Response, next: NextFunction) {
     if (!req.headers['authorization']) return next(createError.Unauthorized());
     const { JWT_KEY_ACCESS_TOKEN } = process.env;
     const header: string = req.headers['authorization'];
-    const bearerToken = header.split(' ');
-    const token = bearerToken[1];
+    const bearerToken: string[] = header.split(' ');
+    const token: string = bearerToken[1];
     const secret: string = JWT_KEY_ACCESS_TOKEN;
-    JWT.verify(token, secret, (err, payload) => {
+    JWT.verify(token, secret, (err, payload: JWT.JwtPayload) => {
       if (err) next(err);
       req.payload = payload;
       next();
@@ -64,7 +64,7 @@ export async function signJwt(userId: string): Promise<string> {
       const secret: string = JWT_KEY_ACCESS_TOKEN;
 
       const option: object = {
-        expiresIn: '1m',
+        expiresIn: '15m',
       };
       JWT.sign(payload, secret, option, (err, token) => {
         if (err) reject(err);
