@@ -24,14 +24,14 @@
   "schemes": ["http"],
   "host": "localhost:8000",
   "basePath": "/api-v1",
+  "securityDefinitions": {
+    "JWT": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "Authorization"
+    }
+  },
   "components": {
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      }
-    },
     "schemas": {
       "REGISTER_USER": {
         "type": "object",
@@ -153,11 +153,7 @@
     }
   },
 
-  "security": [
-    {
-      "bearerAuth": []
-    }
-  ],
+  
   "paths": {
     "/user/register": {
       "post": {
@@ -292,6 +288,11 @@
         "summary": "Get list user",
         "description": "Get list user",
         "produces": ["application/json"],
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
         "parameters": [],
         "tags": ["User-MONGOOSE"],
         "responses": {
@@ -747,6 +748,11 @@
         "description": "Get list user",
         "produces": ["application/json"],
         "parameters": [],
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
         "tags": ["User-TypeORM"],
         "responses": {
           "400": {

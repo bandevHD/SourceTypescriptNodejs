@@ -2,11 +2,12 @@
   "compilerOptions": {
     "lib": ["es5", "es6", "dom"],
     "module": "CommonJS",
-    "target": "es6",
+    "target": "es5",
     "outDir": "./dist",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "sourceMap": true
   }
 }

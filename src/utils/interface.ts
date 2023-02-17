@@ -1,5 +1,4 @@
-import { User } from '../model/typeorm';
-import { CreateUserType, FindUserType, LoginUserType, RefreshTokenType, LogoutType } from './types';
+import { CreateUserType, LoginUserType, RefreshTokenType, LogoutType } from './types';
 export default interface IUserService {
   register(createUserType: CreateUserType);
   loginUser(loginUserType: LoginUserType);
