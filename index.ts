@@ -29,11 +29,11 @@ dotenv.config();
 const app = express();
 app.use(morgan('common'));
 app.enable('trust proxy');
-// app.use(
-//   cors({
-//     orgin: '*',
-//   }),
-// );
+app.use(
+  cors({
+    origin: '*',
+  }),
+);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

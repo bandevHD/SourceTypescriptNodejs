@@ -14,12 +14,7 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import { StatusCodes } from 'http-status-codes';
 import IUserService from '../../../utils/interface';
-import {
-  CreateUserType,
-  FindUserType,
-  LoginUserType,
-  RefreshTokenType,
-} from '../../../utils/types';
+import { CreateUserType, LoginUserType, RefreshTokenType } from '../../../utils/types';
 import { Repository } from 'typeorm';
 import { myDataSource } from '../../../config/conenctTypeORM';
 import redis from '../../../config/connectRedis';
