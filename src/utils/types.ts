@@ -1,3 +1,8 @@
+import { BaseEntity } from 'typeorm';
+import { User } from '../model/typeorm/postgressql';
+import { InterfaceType, Field, InputType, ObjectType } from 'type-graphql';
+import { JobAttributesData } from 'agenda';
+
 export type CreateUserType = {
   email: string;
   password: string;
@@ -71,3 +76,57 @@ export type FindUserType = Partial<{
   id: string;
   email: string;
 }>;
+
+export abstract class CoreEntity extends BaseEntity {}
+
+//Types response
+@InterfaceType({ isAbstract: true })
+export abstract class ResultResponse {
+  @Field()
+  statusCode!: number;
+
+  @Field({ nullable: true })
+  message?: string;
+}
+
+@ObjectType({ implements: ResultResponse })
+export class UserResponse implements ResultResponse {
+  @Field({ nullable: true })
+  data?: User;
+
+  @Field({ nullable: false })
+  statusCode!: number;
+
+  @Field({ nullable: true })
+  message?: string;
+}
+
+@InputType()
+export class RegisterUserType {
+  @Field()
+  email!: string;
+
+  @Field()
+  password!: string;
+
+  @Field()
+  firstName!: string;
+
+  @Field()
+  lastName!: string;
+}
+
+@InputType()
+export class LoginUserGraphqlType {
+  @Field({ nullable: false })
+  email!: string;
+
+  @Field({ nullable: false })
+  password!: string;
+}
+
+//Types job
+
+export interface SendMailContaxt extends JobAttributesData {
+  to: string;
+}

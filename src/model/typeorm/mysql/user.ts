@@ -1,7 +1,7 @@
 import { Exclude } from 'class-transformer';
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ name: 'user', engine: 'InnoDB DEFAULT CHARSET=utf8mb4COLLATE=utf8mb4_unicode_ci' })
+@Entity({ name: 'user' })
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;

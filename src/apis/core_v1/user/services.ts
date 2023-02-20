@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { resgiterValidate } from './dto/register.input';
 import { userLoginValidate } from './dto/login.input';
 import createError from 'http-errors';
-import { User } from '../../../model/typeorm';
+import { User } from '../../../model/typeorm/mysql';
 import UserMongo from '../../../model/mongodb/user';
 import {
   signJwt,
@@ -20,6 +20,7 @@ import { myDataSource } from '../../../config/conenctTypeORM';
 import redis from '../../../config/connectRedis';
 import { refreshValidate } from './dto/refreshToken.input';
 import { logoutValidate } from './dto/logout.input';
+import { handlerEmail } from '../../modules/emailService';
 
 dotenv.config();
 
@@ -51,6 +52,9 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     });
 
     const saveUser = await user.save();
+
+    const html = 'Bạn đã đăng ký tài khoản thành công';
+    await handlerEmail(email, html);
 
     return res.json({
       status: StatusCodes.OK,

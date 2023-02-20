@@ -1,10 +1,10 @@
 import { DataSource } from 'typeorm';
 import dotenv from 'dotenv';
-import entities from '../model/typeorm/index';
+import entities from '../model/typeorm/mysql/index';
 
 dotenv.config();
 
-export const myDataSource = new DataSource({
+export const myDataSource: DataSource = new DataSource({
   type: 'mysql',
   host: process.env.MYSQL_DB_HOST,
   port: parseInt(process.env.MYSQL_DB_PORT),
@@ -17,3 +17,13 @@ export const myDataSource = new DataSource({
   synchronize: true,
   migrationsRun: true,
 });
+
+export const connectSql = () =>
+  myDataSource
+    .initialize()
+    .then(() => {
+      console.log('Data Source has been initialized mysql!');
+    })
+    .catch((err) => {
+      console.error('Error during Data Source initialization:', err);
+    });

@@ -1,5 +1,6 @@
 require('reflect-metadata');
 import { Repository } from 'typeorm';
+// import AgendaClass from '../../config/agenda';
 import { myDataSource } from '../../config/conenctTypeORM';
 
 interface ObjectLiteral {
@@ -10,10 +11,12 @@ export class BaseService<Model extends ObjectLiteral> {
   constructor(model: Model) {
     this.target = model;
     this.reposity = myDataSource.getRepository(this.target);
+    // this.jobService = new AgendaClass();
   }
   private readonly reposity: Repository<Model>;
+  jobService;
 
-  createService = async (data: any) => {
+  createService = async (data) => {
     const newData = this.reposity.create(data);
     const saveData = await this.reposity.save(newData);
     return { statusCode: 200, data: saveData };
@@ -30,7 +33,7 @@ export class BaseService<Model extends ObjectLiteral> {
     };
   };
 
-  readOneService = async (data: any) => {
+  readOneService = async (data) => {
     const findOneData = await this.reposity.findOneBy(data);
     return {
       statusCode: 200,
@@ -38,7 +41,7 @@ export class BaseService<Model extends ObjectLiteral> {
     };
   };
 
-  updatePutService = async (id: any, data: any) => {
+  updatePutService = async (id, data) => {
     return await this.reposity
       .update(id, data)
       .then(() => {
@@ -56,7 +59,7 @@ export class BaseService<Model extends ObjectLiteral> {
       });
   };
 
-  deleteService = async (id: any, data: any) => {
+  deleteService = async (id, data) => {
     await this.reposity.update(id, data);
     return {
       statusCode: 200,

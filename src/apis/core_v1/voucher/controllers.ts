@@ -1,10 +1,22 @@
-import VoucherService from './services';
+import VoucherService, { createVoucherMongooseService } from './services';
 import { NextFunction, Request, Response } from 'express';
 import { createValidate } from './dto/create.input';
 import { createVoucher } from '../../../utils/constant';
 import * as _ from 'lodash';
 import { updatePutValidate } from './dto/updatePut.input';
-
+import { StatusCodes } from 'http-status-codes';
+export const createVoucherMongooseController = async (req: Request, res: Response) => {
+  try {
+    const data = await createVoucherMongooseService(req.body);
+    res.status(StatusCodes.OK).json({
+      statusCode: StatusCodes.OK,
+      message: 'Tạo voucher thành công',
+      data,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 class VoucherController {
   voucherservice;
   constructor() {

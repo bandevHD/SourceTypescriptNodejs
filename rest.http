@@ -5,7 +5,7 @@ Content-Type: application/json
 {
     "firstName": "Ban",
     "lastName": "Tran",
-    "email": "TrannhatBan4123@gmail.com",
+    "email": "trannhatban34@gmail.com",
     "password": "abc123"
 }
 
@@ -77,6 +77,23 @@ Content-Type: application/json
 ###Get list user typeorm mysql
 GET http://localhost:8000/api-v1/user/list-users-typeorm
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5YWFlZmI2Mi02MDBjLTQxMTctOGZmYi04YTZhNjZlMGE4M2YiLCJpYXQiOjE2NzY2MDI3MTAsImV4cCI6MTY3NjYwMzYxMH0.pRpgTLnXBTWfAXBCYFTtBtXe_1SGy_2_py4LvTi_sPQ
+
+
+###RESTFUL api
+POST http://localhost:8000/api-v1/voucher/createVoucher
+Content-Type: application/json
+
+{
+    "title": "Giảm giá khuyến mãi ngày valentine 1",
+    "content": "Ok",
+    "description": "Ok",
+    "discount": "1233",
+    "quantity": 12,
+    "startTimeAt": "2023-02-20 17:42",
+    "endTimeAt": "2023-02-20 23:23",
+    "isInactive": "true",
+    "isDelete": "false"
+}
 
 ###RESTFUL api
 POST http://localhost:8000/api-v1/voucher/create-voucher

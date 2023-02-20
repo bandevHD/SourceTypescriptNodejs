@@ -1,7 +1,10 @@
 import { Router } from 'express';
-import VoucherController from '../voucher/controllers';
+import VoucherController, { createVoucherMongooseController } from '../voucher/controllers';
 const voucherRouter: any = Router();
 const voucherController = new VoucherController();
+
+//Create voucher mongoose
+voucherRouter.post('/createVoucher', createVoucherMongooseController);
 
 //Restful APIs CRUD Voucher
 voucherRouter.post('/create-voucher', voucherController.createController);
