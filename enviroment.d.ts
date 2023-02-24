@@ -13,5 +13,6 @@ declare namespace NodeJS {
     POSTGRES_DB_USERNAME?: string;
 
     MONGGODB_URI?: string;
+    JWT_KEY_ACCESS_TOKEN:string
   }
 }

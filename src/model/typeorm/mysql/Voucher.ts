@@ -1,4 +1,5 @@
-import { CreateDateColumn, UpdateDateColumn } from 'typeorm';
+require('reflect-metadata');
+import { CreateDateColumn, DeleteDateColumn, UpdateDateColumn } from 'typeorm';
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'voucher' })
@@ -42,4 +43,7 @@ export class Voucher {
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
   public updated_at: Date;
+
+  @DeleteDateColumn()
+  public delete_at: Date;
 }

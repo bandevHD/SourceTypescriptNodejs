@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { resgiterValidate } from './dto/register.input';
 import { userLoginValidate } from './dto/login.input';
 import createError from 'http-errors';
-import { User } from '../../../model/typeorm/mysql';
+import { User } from '../../../model/typeorm/mysql/index';
 import UserMongo from '../../../model/mongodb/user';
 import {
   signJwt,
@@ -21,6 +21,7 @@ import redis from '../../../config/connectRedis';
 import { refreshValidate } from './dto/refreshToken.input';
 import { logoutValidate } from './dto/logout.input';
 import { handlerEmail } from '../../modules/emailService';
+import { RESPONSES } from '../../../utils/HttpStatusResponseCode';
 
 dotenv.config();
 
@@ -30,8 +31,8 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     const isValid = resgiterValidate(req.body);
 
     if (isValid) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        statusCode: StatusCodes.BAD_REQUEST,
+      return res.status(RESPONSES.BAD_REQUEST.CODE).json({
+        statusCode: RESPONSES.BAD_REQUEST.REGISTER_MISSING_PARAMATER,
         message: isValid ? isValid : '',
       });
     }
@@ -39,9 +40,8 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     const isUserExits = await UserMongo.findOne({ email });
 
     if (isUserExits) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusCodes.BAD_REQUEST,
-        message: createError.Conflict(`${email} is ready has been register`).message,
+      return res.status(RESPONSES.CONFLICT.CODE).json({
+        statusCode: RESPONSES.CONFLICT.EMAIL_EXIST,
       });
     }
     const user = new UserMongo({
@@ -56,10 +56,7 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     const html = 'Bạn đã đăng ký tài khoản thành công';
     await handlerEmail(email, html);
 
-    return res.json({
-      status: StatusCodes.OK,
-      data: saveUser,
-    });
+    return saveUser;
   } catch (error) {
     next(error);
   }
@@ -72,8 +69,8 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     const isValid: string = userLoginValidate(req.body);
 
     if (isValid) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        statusCode: StatusCodes.BAD_REQUEST,
+      return res.status(RESPONSES.BAD_REQUEST.CODE).json({
+        statusCode: RESPONSES.BAD_REQUEST.REGISTER_MISSING_PARAMATER,
         message: isValid ? isValid : '',
       });
     }
@@ -81,27 +78,27 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     const user = await UserMongo.findOne({ email });
 
     if (!user) {
-      return res.json({
-        status: StatusCodes.BAD_REQUEST,
-        message: createError.NotFound(`User not registed`).message,
+      return res.status(RESPONSES.NOT_FOUND.CODE).json({
+        statusCode: RESPONSES.NOT_FOUND.USER_NOT_FOUND,
       });
     }
 
     const isValidUser: boolean = await bcrypt.compare(password, user.password);
 
     if (!isValidUser) {
-      return res.json({
-        status: StatusCodes.BAD_REQUEST,
-        message: createError.Unauthorized(`Password is not correct`).message,
+      return res.status(RESPONSES.UNAUTHORIZED.CODE).json({
+        statusCode: RESPONSES.UNAUTHORIZED.PASSWORD_NOT_CORRECT,
       });
     }
 
     const accessToken: string = await signJwt(user._id.toString());
     const refreshToken: string = await signJwtRefreshToken(user._id.toString());
-    return res.json({
-      status: StatusCodes.OK,
-      accessToken,
-      refreshToken,
+    return res.status(RESPONSES.OK.CODE).json({
+      statusCode: RESPONSES.OK.LOGIN_SUCCESS,
+      data: {
+        accessToken,
+        refreshToken,
+      },
     });
   } catch (error) {
     next(error);
@@ -115,8 +112,8 @@ export async function refreshToken(req: Request, res: Response, next: NextFuncti
     const isValid: string = refreshValidate(req.body);
 
     if (isValid)
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        statusCode: StatusCodes.BAD_REQUEST,
+      return res.status(RESPONSES.BAD_REQUEST.CODE).json({
+        statusCode: RESPONSES.BAD_REQUEST.REGISTER_MISSING_PARAMATER,
         message: isValid ? isValid : '',
       });
 
@@ -130,10 +127,12 @@ export async function refreshToken(req: Request, res: Response, next: NextFuncti
       EX: 365 * 24 * 60 * 60,
       NX: true,
     });
-    return res.json({
-      status: 200,
-      accessToken,
-      refreshToken,
+    return res.status(RESPONSES.OK.CODE).json({
+      statusCode: RESPONSES.OK.REFRESHTOKEN_SUCCESS,
+      data: {
+        accessToken,
+        refreshToken,
+      },
     });
   } catch (error) {
     next(error);
@@ -147,8 +146,8 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
     const isValid: string = logoutValidate(req.body);
 
     if (isValid)
-      return res.status(422).json({
-        statusCode: 422,
+      return res.status(RESPONSES.BAD_REQUEST.CODE).json({
+        statusCode: RESPONSES.BAD_REQUEST.REGISTER_MISSING_PARAMATER,
         message: isValid ? isValid : '',
       });
 
@@ -156,9 +155,8 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
 
     redis.del(userId);
 
-    return res.json({
-      status: 200,
-      message: 'Logout',
+    return res.status(RESPONSES.OK.CODE).json({
+      statusCode: RESPONSES.OK.LOGOUT_SUCCESS,
     });
   } catch (error) {
     next(error);
@@ -169,8 +167,8 @@ export async function getList(req: Request, res: Response, next: NextFunction) {
   try {
     const findAllUser = await UserMongo.find();
 
-    return res.json({
-      status: 200,
+    return res.status(RESPONSES.OK.CODE).json({
+      statusCode: RESPONSES.OK.GET_LIST_USER_SUCCESS,
       data: findAllUser,
     });
   } catch (error) {
@@ -184,22 +182,15 @@ export default class UserService implements IUserService {
     this.userReposity = myDataSource.getRepository(User);
   }
   register = async (createUserType: CreateUserType) => {
-    const isValid = resgiterValidate(createUserType);
-
-    if (isValid) {
-      return {
-        statusCode: StatusCodes.BAD_REQUEST,
-        message: isValid ? isValid : '',
-      };
-    }
+    const { email } = createUserType;
     const existingUser: User = await this.userReposity.findOneBy({
-      email: createUserType.email,
+      email,
     });
-    if (existingUser) return { statusCode: StatusCodes.CONFLICT };
+    if (existingUser) return { statusCode: RESPONSES.CONFLICT.EMAIL_EXIST };
     const password: string = await hashPassword(createUserType.password);
     const newUser: User = this.userReposity.create({ ...createUserType, password });
     const saveUser: User = await this.userReposity.save(newUser);
-    return { statusCode: StatusCodes.OK, data: saveUser.id };
+    return { id: saveUser.id };
   };
 
   loginUser = async (loginUserType: LoginUserType) => {
@@ -293,6 +284,14 @@ export default class UserService implements IUserService {
         count,
         result,
       },
+    };
+  };
+
+  findOneUser = async (id: string) => {
+    const result = await this.userReposity.findOneBy({ id });
+    return {
+      statusCode: StatusCodes.OK,
+      data: result,
     };
   };
 }

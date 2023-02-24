@@ -3,6 +3,10 @@ import UserService from './services';
 import { NextFunction, Request, Response } from 'express';
 import IUserService from '../../../utils/interface';
 import * as _ from 'lodash';
+import path from 'path';
+import { BaseController } from '../../base/base_controller';
+import { RESPONSES } from '../../../utils/HttpStatusResponseCode';
+import { resgiterValidate } from './dto/register.input';
 
 export const registerController = async (req: Request, res: Response, next: NextFunction) =>
   await register(req, res, next);
@@ -19,20 +23,35 @@ export const refreshTokenController = async (req: Request, res: Response, next: 
 export const logoutController = async (req: Request, res: Response, next: NextFunction) =>
   await logout(req, res, next);
 
-class UserController {
+class UserController extends BaseController {
   userservice: IUserService;
   constructor() {
+    super();
     this.userservice = new UserService();
   }
   register = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.userservice.register(req.body);
-      if (!result.data) res.status(parseInt(result.statusCode));
-      res.json({
-        statusCode: result.statusCode,
-        message: result.message ? result.message : '',
-        data: result.data ? result.data : null,
-      });
+      const isValid = resgiterValidate(req.body);
+      if (isValid) {
+        this.resultResponse(
+          res,
+          RESPONSES.BAD_REQUEST.CODE,
+          RESPONSES.BAD_REQUEST.REGISTER_MISSING_PARAMATER,
+          {
+            message: isValid ? isValid : null,
+          },
+        );
+      }
+
+      let result = await this.userservice.register(req.body);
+      let code = RESPONSES.OK.CODE;
+      let statusCode = RESPONSES.OK.REGISTER_SUCCESS;
+      if (result.statusCode) {
+        code = result.statusCode.slice(0, 3);
+        statusCode = result.statusCode;
+        result = {};
+      }
+      this.resultResponse(res, code, statusCode, result);
     } catch (error) {
       next(error);
     }
@@ -89,6 +108,40 @@ class UserController {
         statusCode: result.statusCode,
         message: result.message ? result.message : '',
         data: result.data ? result.data : '',
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getOneUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = req.params.id;
+      const result = await this.userservice.findOneUser(id);
+      if (!result.data) res.status(parseInt(result.statusCode));
+      res.json({
+        statusCode: result.statusCode,
+        message: result.message ? result.message : '',
+        data: result.data ? result.data : '',
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getListUserHtml = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      return res.sendFile(path.join(__dirname, '../../../../../public/template/listUser.html'));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  editTableByMe = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+      return res.json({
+        data: ip,
       });
     } catch (error) {
       next(error);

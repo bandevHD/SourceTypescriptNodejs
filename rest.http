@@ -14,14 +14,13 @@ POST http://localhost:8000/api-v1/user/login
 Content-Type: application/json
 
 {
-    "email": "TrannhatBan4123@gmail.com",
+    "email": "trannhatban34@gmail.com",
     "password": "abc123"
 }
 ###
 
 GET  http://localhost:8000/api-v1/user/list-users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2M2VlZTVlOWI3NDFjYTRiNTJiY2I5YzciLCJpYXQiOjE2NzY2MDA5MDEsImV4cCI6MTY3NjYwMTgwMX0.NYbGzTrc0K0sCv1Zqpi-MyyZbZV9-Do802eFzLR0Zf0
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2M2Y2YzIzN2EwZWVhNDNmMzc2NGRmZGUiLCJpYXQiOjE2NzcxMTU5ODgsImV4cCI6MTY3NzExNjg4OH0.88j7qD3YgdLZB5x57aDe89IASzEEt-8iG2Lah8rXWjs
 ###
 POST http://localhost:8000/api-v1/user/refresh-token
 Content-Type: application/json
@@ -45,7 +44,7 @@ Content-Type: application/json
 {
     "firstName": "Trần",
     "lastName": "A",
-    "email": "tranA@gmail.com",
+    "email": "A@gmail.com",
     "password": "abc123"
 }
 
@@ -74,26 +73,55 @@ Content-Type: application/json
      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5YWFlZmI2Mi02MDBjLTQxMTctOGZmYi04YTZhNjZlMGE4M2YiLCJpYXQiOjE2NzY2MDIxMjIsImV4cCI6MTcwODE1OTcyMn0.JF0ANlwnCYn3Yg-2X9GpwiEwz4pIjABCCqpop40Kdm4"
 }
 
+###Get one user typeorm mysql
+GET http://localhost:8000/api-v1/user/get-one-users-typeorm/6e4515ae-4227-47b9-a98f-711963bad4db
+
 ###Get list user typeorm mysql
 GET http://localhost:8000/api-v1/user/list-users-typeorm
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5YWFlZmI2Mi02MDBjLTQxMTctOGZmYi04YTZhNjZlMGE4M2YiLCJpYXQiOjE2NzY2MDI3MTAsImV4cCI6MTY3NjYwMzYxMH0.pRpgTLnXBTWfAXBCYFTtBtXe_1SGy_2_py4LvTi_sPQ
 
 
-###RESTFUL api
+###Get one user typeorm mysql
+POST http://localhost:8000/api-v1/user/me6e4515ae-4227-47b9-a98f-711963bad4db/editable/me
+
+###Apis Voucher mongodb
 POST http://localhost:8000/api-v1/voucher/createVoucher
 Content-Type: application/json
 
 {
-    "title": "Giảm giá khuyến mãi ngày valentine 1",
+    "title": "Giảm giá khuyến mãi ngày valentine 2",
     "content": "Ok",
     "description": "Ok",
     "discount": "1233",
     "quantity": 12,
-    "startTimeAt": "2023-02-20 17:42",
+    "startTimeAt": "2023-02-20 23:34",
     "endTimeAt": "2023-02-20 23:23",
-    "isInactive": "true",
+    "isInactive": "false",
     "isDelete": "false"
 }
+
+###
+PUT http://localhost:8000/api-v1/voucher/updateVoucher
+Content-Type: application/json
+
+{
+    "_id": "63f745ec6bd17872ce704dd7",
+    "title": "Giảm giá khuyến mãi ngày 24-2-2023",
+    "content": "Ok",
+    "description": "Ok",
+    "discount": "1233",
+    "quantity": 12,
+    "startTimeAt": "2023-02-24 11:58",
+    "endTimeAt": "2023-02-24 23:23",
+    "isInactive": "false",
+    "isDelete": "false"
+}
+
+###
+GET  http://localhost:8000/api-v1/voucher/getListVoucher
+
+###
+GET  http://localhost:8000/api-v1/voucher/getOneVoucher/63f745ec6bd17872ce704dd7
 
 ###RESTFUL api
 POST http://localhost:8000/api-v1/voucher/create-voucher
@@ -108,15 +136,14 @@ Content-Type: application/json
     "startTimeAt": "16-02-2023 10:23",
     "endTimeAt": "16-02-2023 23:23",
     "isInactive": "true",
-    "isDelete": "false",
-    "hackchetmema": "Ok"
+    "isDelete": "false"
 }
 
 ###
-GET http://localhost:8000/api-v1/voucher/read-list-voucher
+GET http://localhost:8000/api-v1/voucher/get-list-voucher/2/1
 
 ###
-GET http://localhost:8000/api-v1/voucher/read-one-voucher/1bcac2be-fde7-4e74-bb44-89fc2f50e85b
+GET http://localhost:8000/api-v1/voucher/get-one-voucher/bc653707-45e7-4e31-987b-7dfd7e2a76a5
 
 ###
 PUT http://localhost:8000/api-v1/voucher/update-voucher/
@@ -140,7 +167,7 @@ DELETE http://localhost:8000/api-v1/voucher/delete-voucher/
 Content-Type: application/json
 
 {
-    "id": "1bcac2be-fde7-4e74-bb44-89fc2f50e85b"
+    "id": "bc653707-45e7-4e31-987b-7dfd7e2a76a5"
 }
 
 

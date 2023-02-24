@@ -3,6 +3,10 @@ import mongoose from 'mongoose';
 // Declare the Schema of the Mongo model
 const voucherSchema = new mongoose.Schema(
   {
+    code: {
+      type: String,
+      required: true,
+    },
     title: {
       type: String,
       required: true,
@@ -14,12 +18,16 @@ const voucherSchema = new mongoose.Schema(
       type: String,
     },
     discount: {
-      type: String,
+      type: Number,
       required: true,
     },
     quantity: {
-      type: String,
+      type: Number,
       required: true,
+    },
+    maxiMumQuantity: {
+      type: Number,
+      requied: true,
     },
     startTimeAt: {
       type: String,

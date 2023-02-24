@@ -24,6 +24,9 @@ userRouter.post('/register-typeorm', userController.register);
 userRouter.post('/login-typeorm', userController.login);
 userRouter.post('/refresh-token-typeorm', userController.refreshToken);
 userRouter.delete('/logout-typeorm', userController.logout);
-userRouter.get('/list-users-typeorm', verifyToken, userController.getListUser);
+userRouter.get('/list-users-typeorm', userController.getListUser);
+userRouter.get('/get-one-users-typeorm/:id', userController.getOneUser);
+userRouter.get('/list-users-html', userController.getListUserHtml);
+userRouter.post('/:id/editable/me', userController.editTableByMe);
 
 export default userRouter;

@@ -1,10 +1,15 @@
 import nodemailer from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import dotenv from 'dotenv';
-
+import Handlebars = require('handlebars');
+// import from '../../../public/email/email.mjml'
+import fs from 'fs-extra';
+import path = require('path');
+import mjml from 'mjml';
+import { MJMLParseResults } from 'mjml-core';
 dotenv.config();
 
-export const handlerEmail = async (email: string, html: string) => {
+export const handlerEmail = async (email: string, html) => {
   const transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo> =
     nodemailer.createTransport({
       host: 'smtp.gmail.com',
@@ -25,4 +30,24 @@ export const handlerEmail = async (email: string, html: string) => {
   });
 
   return info;
+};
+
+export const handlerEmailMjML = async (email: string, objectTemplate: object) => {
+  try {
+    const readFile = await fs.readFile(
+      path.resolve(__dirname, '../../../../public/email/email.mjml'),
+      {
+        encoding: 'utf-8',
+      },
+    );
+
+    const template: HandlebarsTemplateDelegate<any> = Handlebars.compile(readFile);
+
+    const htmlRender: MJMLParseResults = mjml(template(objectTemplate ? objectTemplate : {}));
+
+    // send mail with defined transport object
+    await handlerEmail(email, htmlRender.html);
+  } catch (error) {
+    throw new Error(error);
+  }
 };

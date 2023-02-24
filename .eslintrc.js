@@ -19,9 +19,11 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     'prettier/prettier': ['error', { endOfLine: 'auto' }],
-    // '@typescript-eslint/no-inferrable-types': 'error',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'warn',
+    // '@typescript-eslint/no-inferrable-types': [],
+    // 'eslint prefer-const': ["error", {"destructuring": "all"}]
+    // 'eslint prefer-const': ['error', {ignoreReadBeforeAssign: false}],
     // "no-console": "error"
   },
 };

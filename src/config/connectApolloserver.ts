@@ -8,6 +8,7 @@ import {
 } from 'apollo-server-core';
 import { UserResolver, Hello } from '../graphql/resolvers/index';
 import dotenv from 'dotenv';
+import { expressInterface } from '../utils/interface';
 
 dotenv.config();
 const app = express();
@@ -23,6 +24,7 @@ export const connectApolloServer = async () => {
       ApolloServerPluginDrainHttpServer({ httpServer }),
       ApolloServerPluginLandingPageGraphQLPlayground,
     ],
+    context: ({ req, res }): Pick<expressInterface, 'req' | 'res'> => ({ req, res }),
   });
 
   await apolloServer.start();
@@ -32,8 +34,8 @@ export const connectApolloServer = async () => {
   await new Promise((resolve) =>
     httpServer.listen({ port: process.env.PORTAPOLOSERVER }, resolve as () => void),
   );
-  // http://localhost:8000/graphql
+  // http://localhost:4000/graphql
   console.log(
-    `Server grapql on localhost  http://localhost:${process.env.PORTAPOLOSERVER}/${apolloServer.graphqlPath}`,
+    `Server grapql on localhost  http://localhost:${process.env.PORTAPOLOSERVER}${apolloServer.graphqlPath}`,
   );
 };

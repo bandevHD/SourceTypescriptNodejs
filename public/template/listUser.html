@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 8px;
+      }
+
+      tr:nth-child(even) {
+        background-color: #f2f2f2;
+      }
+      input:hover {
+        cursor: pointer;
+      }
+    </style>
+    <script>
+      fetch('http://localhost:8000/api-v1/user/list-users-typeorm')
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          const dataLoop = data.data.result;
+          const theadTable = document.querySelector('thead');
+          const tbodyTable = document.querySelector('tbody');
+
+          tbodyTable.innerHTML = '';
+
+          for (const item of dataLoop) {
+            console.log(item.email);
+            const row = document.createElement('tr');
+            const firstNamecelElement = document.createElement('td');
+
+            firstNamecelElement.textContent = item.firstName;
+
+            const lastNamecelElement = document.createElement('td');
+
+            lastNamecelElement.textContent = item.lastName;
+
+            const emailcelElement = document.createElement('td');
+
+            emailcelElement.textContent = item.email;
+
+            const buttontd = document.createElement('td');
+            const buttonElement = document.createElement('input');
+            buttontd.textContent = 'Cập nhật ';
+            buttonElement.type = 'button';
+            buttonElement.addEventListener(
+              'click',
+              function (e) {
+                document.location.href =
+                  'http://localhost:8000/api-v1/user/get-one-users-typeorm/';
+                alert('something');
+              },
+              false,
+            );
+            buttonElement.style.backgroundColor = 'green';
+            buttonElement.style.width = '50px';
+            buttontd.append(buttonElement);
+
+            row.append(firstNamecelElement, lastNamecelElement, emailcelElement, buttontd);
+            tbodyTable.appendChild(row);
+          }
+        });
+    </script>
+  </head>
+  <body>
+    <h2>Edit event table</h2>
+
+    <div style="overflow-x: auto">
+      <table id="table">
+        <thead>
+          <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Edit</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </body>
+</html>

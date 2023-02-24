@@ -7,23 +7,20 @@ import morgan from 'morgan';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import apiCoreV1 from './src/apis/core_v1/routers/router';
-
-import { StatusCodes } from 'http-status-codes';
 import swaggerUi from 'swagger-ui-express';
 import fs = require('fs');
 import { connectSql } from './src/config/conenctTypeORM';
 // import redis from './src/config/connectRedis';
 import dbConnect from './src/config/connectMongoDb';
-import { startSchedule } from './src/config/agenda';
 import { connectPostgresql } from './src/config/connectPostgresql';
 import { connectApolloServer } from './src/config/connectApolloserver';
-// import AgendaClass from './src/config/agenda';
-// import { agenda } from './src/config/agenda';
+import { cronJobApp } from './src/apis/core_v1/cronjob/job';
+import { RESPONSES } from './src/utils/HttpStatusResponseCode';
+import { graceful } from './src/config/agenda';
 
 // import crypto from 'crypto';
 // import YAML from 'yamljs';
 // import path from 'path';
-import VoucherService from './src/apis/core_v1/voucher/services';
 
 // const key1 = crypto.randomBytes(32).toString('hex');
 // const key2 = crypto.randomBytes(32).toString('hex');
@@ -49,38 +46,37 @@ app.use(bodyParser.json());
 //Connect db mongodb, mysql, postgresql
 dbConnect();
 connectSql();
-// connectPostgresql();
-// connectApolloServer();
-// startSchedule();
+connectPostgresql();
+connectApolloServer();
+cronJobApp();
 
 const swaggerFile = process.cwd() + '/swagger/swagger.json';
 const swaggerData = fs.readFileSync(swaggerFile, 'utf8');
 const swaggerDocument = JSON.parse(swaggerData);
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
+app.use(express.static(__dirname + '/public'));
 app.use('/api-v1', apiCoreV1);
 //handle error internal server
 app.use((err, req, res, next) => {
-  return res
-    .status(StatusCodes.INTERNAL_SERVER_ERROR)
-    .json({ message: err.message, messageCode: '500' });
+  return res.status(RESPONSES.INTERNAL_SERVER_ERROR.CODE).json({
+    message: err.message,
+    messageCode: RESPONSES.INTERNAL_SERVER_ERROR.SOMETHING_WENT_WRONG,
+  });
 });
 
 //handle api not found
 app.use((req, res) => {
-  return res.status(StatusCodes.NOT_FOUND).json({ messageCode: '400a' });
+  return res
+    .status(RESPONSES.NOT_FOUND.CODE)
+    .json({ messageCode: RESPONSES.NOT_FOUND.API_NOT_FOUND });
 });
-const agendaJob = new VoucherService();
 const PORT = process.env.PORT || 5000;
-app
-  .get('/', function (request, response) {})
-  .listen(PORT, () => {
-    agendaJob.cronjobSendMailVoucher();
-    console.log(`Server runing at ${PORT}`);
-  });
+app.listen(PORT, () => {
+  console.log(`Server runing at ${PORT}`);
+});
 
-// process.on('SIGTERM', agendaJob.agendaStop);
-// process.on('SIGINT', agendaJob.agendaStop);
+process.on('SIGTERM', graceful);
+process.on('SIGINT', graceful);
 
 // process.on('SIGTERM', agendaDrain);
 // process.on('SIGINT', agendaDrain);

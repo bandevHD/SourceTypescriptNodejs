@@ -3,18 +3,17 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const { MONGGODB_URI } = process.env;
+const { MONGODB_ATLAS } = process.env;
 
 mongoose.set('strictQuery', false);
 
-const dbConnect = async () => {
+export default async function dbConnect() {
   try {
-    const conn = await mongoose.connect(MONGGODB_URI);
+    const conn = await mongoose.connect(MONGODB_ATLAS);
     if (conn.connection.readyState === 1) console.log(`Database connect success`);
+    return conn;
   } catch (error) {
     console.log(`Database connect failed`);
     throw new Error(error);
   }
-};
-
-export default dbConnect;
+}

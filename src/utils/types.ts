@@ -1,7 +1,8 @@
 import { BaseEntity } from 'typeorm';
 import { User } from '../model/typeorm/postgressql';
 import { InterfaceType, Field, InputType, ObjectType } from 'type-graphql';
-import { JobAttributesData } from 'agenda';
+import { Job, JobAttributesData } from 'agenda';
+import { JwtPayload } from 'jsonwebtoken';
 
 export type CreateUserType = {
   email: string;
@@ -79,11 +80,16 @@ export type FindUserType = Partial<{
 
 export abstract class CoreEntity extends BaseEntity {}
 
+export type PaginationType = {
+  skip: number;
+  take: number;
+};
+
 //Types response
 @InterfaceType({ isAbstract: true })
 export abstract class ResultResponse {
   @Field()
-  statusCode!: number;
+  statusCode: number;
 
   @Field({ nullable: true })
   message?: string;
@@ -95,10 +101,25 @@ export class UserResponse implements ResultResponse {
   data?: User;
 
   @Field({ nullable: false })
-  statusCode!: number;
+  statusCode: number;
 
   @Field({ nullable: true })
   message?: string;
+}
+
+@ObjectType()
+export class LoginResponse {
+  @Field({ nullable: false })
+  statusCode: number;
+
+  @Field({ nullable: true })
+  message: string;
+
+  @Field({ nullable: true })
+  accessToken?: string;
+
+  @Field({ nullable: true })
+  refreshToken?: string;
 }
 
 @InputType()
@@ -125,8 +146,37 @@ export class LoginUserGraphqlType {
   password!: string;
 }
 
-//Types job
+@InputType()
+export class RefreshtokeUserGraphqlType {
+  @Field({ nullable: false })
+  refreshToken!: string;
+}
 
+@InputType()
+export class LogoutUserGraphqlType {
+  @Field({ nullable: false })
+  refreshToken!: string;
+}
+
+export type TypeJWTPayload = JwtPayload & { userId: number };
+
+// @InputType()
+// export class VerytokenGraphqlType {
+//   @Field({ nullable: false })
+//   req!: Request;
+// }
+
+//Types job
 export interface SendMailContaxt extends JobAttributesData {
   to: string;
 }
+
+export type SendEmailVoucherBull = {
+  to: string;
+};
+
+export type job = { job: Job<JobAttributesData> };
+
+export type Processor<JobAttributes> =
+  | ((job: Job<JobAttributes>) => Promise<void>)
+  | ((job: Job<JobAttributes>, done: () => void) => void);

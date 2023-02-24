@@ -1,16 +1,67 @@
-import VoucherService, { createVoucherMongooseService } from './services';
+import VoucherService, {
+  createVoucherMongoose,
+  getListVoucherMongoose,
+  getOneVoucherMongoose,
+  updateOneVoucherMongoose,
+} from './services';
 import { NextFunction, Request, Response } from 'express';
 import { createValidate } from './dto/create.input';
 import { createVoucher } from '../../../utils/constant';
 import * as _ from 'lodash';
 import { updatePutValidate } from './dto/updatePut.input';
 import { StatusCodes } from 'http-status-codes';
+import { RESPONSES } from '../../../utils/HttpStatusResponseCode';
+
 export const createVoucherMongooseController = async (req: Request, res: Response) => {
   try {
-    const data = await createVoucherMongooseService(req.body);
+    const time = new Date().getTime();
+    console.log(`Time request-----------${time}`);
+    const data = await createVoucherMongoose(req.body);
     res.status(StatusCodes.OK).json({
       statusCode: StatusCodes.OK,
       message: 'Tạo voucher thành công',
+      data,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const getListVoucherMongooseController = async (req: Request, res: Response) => {
+  try {
+    const data = await getListVoucherMongoose();
+    res.status(RESPONSES.OK.CODE).json({
+      statusCode: RESPONSES.OK.GET_LIST_VOUCHER_SUCCESS,
+      data,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const getOneVoucherMongooseController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const data = await getOneVoucherMongoose(id);
+    res.status(RESPONSES.OK.CODE).json({
+      statusCode: RESPONSES.OK.GET_ONE_VOUCHER_SUCCESS,
+      data,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const updateVoucherController = async (req: Request, res: Response) => {
+  try {
+    const data = await updateOneVoucherMongoose(req.body);
+    if (_.isNull(data)) {
+      return res.status(RESPONSES.NOT_FOUND.CODE).json({
+        statusCode: RESPONSES.NOT_FOUND.VOUCHER_NOT_FOUND,
+      });
+    }
+    res.status(RESPONSES.OK.CODE).json({
+      statusCode: RESPONSES.OK.UPDATE_VOUCHER_SUCCESS,
       data,
     });
   } catch (error) {
@@ -82,7 +133,7 @@ class VoucherController {
 
   readListController = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.voucherservice.readListVoucher();
+      const result = await this.voucherservice.readListVoucher(req.params);
       if (!result.data) res.status(parseInt(result.statusCode));
       res.json({
         statusCode: result.statusCode,
@@ -116,6 +167,17 @@ class VoucherController {
       res.json({
         statusCode: result.statusCode,
         data: result.data ? result.data : null,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  editVoucherByMe = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+      return res.json({
+        data: ip,
       });
     } catch (error) {
       next(error);

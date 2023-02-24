@@ -1,7 +1,7 @@
 require('reflect-metadata');
 import { Repository } from 'typeorm';
-// import AgendaClass from '../../config/agenda';
 import { myDataSource } from '../../config/conenctTypeORM';
+import { PaginationType } from '../../utils/types';
 
 interface ObjectLiteral {
   [key: string]: any;
@@ -11,19 +11,22 @@ export class BaseService<Model extends ObjectLiteral> {
   constructor(model: Model) {
     this.target = model;
     this.reposity = myDataSource.getRepository(this.target);
-    // this.jobService = new AgendaClass();
   }
   private readonly reposity: Repository<Model>;
-  jobService;
 
   createService = async (data) => {
-    const newData = this.reposity.create(data);
+    const newData = await this.reposity.create(data);
     const saveData = await this.reposity.save(newData);
     return { statusCode: 200, data: saveData };
   };
 
-  readListService = async () => {
-    const [result, count] = await this.reposity.findAndCount();
+  readListService = async (paginationType: PaginationType) => {
+    const [result, count] = await this.reposity
+      .createQueryBuilder('vouchers')
+      .orderBy({ created_at: 'DESC' })
+      .skip(paginationType.skip)
+      .take(paginationType.take)
+      .getManyAndCount();
     return {
       statusCode: 200,
       data: {
@@ -60,7 +63,7 @@ export class BaseService<Model extends ObjectLiteral> {
   };
 
   deleteService = async (id, data) => {
-    await this.reposity.update(id, data);
+    await this.reposity.softDelete(id);
     return {
       statusCode: 200,
       data: id,
