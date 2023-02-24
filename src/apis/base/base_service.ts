@@ -2,6 +2,8 @@ require('reflect-metadata');
 import { Repository } from 'typeorm';
 import { myDataSource } from '../../config/conenctTypeORM';
 import { PaginationType } from '../../utils/types';
+import * as _ from 'lodash';
+import { RESPONSES } from '../../utils/HttpStatusResponseCode';
 
 interface ObjectLiteral {
   [key: string]: any;
@@ -24,14 +26,19 @@ export class BaseService<Model extends ObjectLiteral> {
     const [result, count] = await this.reposity
       .createQueryBuilder('vouchers')
       .orderBy({ created_at: 'DESC' })
-      .skip(paginationType.skip)
-      .take(paginationType.take)
+      .limit(paginationType.limit)
+      .offset(paginationType.offset)
       .getManyAndCount();
+    const page: number = _.floor(paginationType.offset / paginationType.limit) + 1;
     return {
-      statusCode: 200,
+      statusCode: RESPONSES.OK.GET_LIST_VOUCHER_SUCCESS,
       data: {
         count,
         result,
+        current_page: page,
+        next_page: page + 1,
+        prev_page: page - 1,
+        limit: paginationType.limit,
       },
     };
   };

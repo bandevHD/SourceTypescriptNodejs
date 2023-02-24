@@ -81,8 +81,8 @@ export type FindUserType = Partial<{
 export abstract class CoreEntity extends BaseEntity {}
 
 export type PaginationType = {
-  skip: number;
-  take: number;
+  limit: number;
+  offset: number;
 };
 
 //Types response
@@ -120,6 +120,26 @@ export class LoginResponse {
 
   @Field({ nullable: true })
   refreshToken?: string;
+}
+
+@ObjectType()
+export class GetUserResponse {
+  @Field()
+  count: number;
+
+  // @Field()
+  // user: [User];
+}
+
+@InputType()
+export class GetOneUserGraphqlType {
+  @Field()
+  id: string;
+}
+
+export class GetListResponse {
+  count: number;
+  user?: User[];
 }
 
 @InputType()

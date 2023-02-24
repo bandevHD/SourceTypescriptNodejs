@@ -17,6 +17,7 @@ export class User extends BaseEntity {
   @Column({ length: 100 })
   firstName: string;
 
+  @Field()
   @Column({ length: 100 })
   lastName: string;
 

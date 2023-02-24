@@ -14,14 +14,14 @@ import {
 
 import { BaseService } from '../../base/base_service';
 import { Voucher } from '../../../model/typeorm/mysql/index';
-import { agenda } from '../../../config/agenda';
+import { agenda, processAgenda } from '../../../config/agenda';
 import { Job } from 'agenda';
 import { handlerEmail, handlerEmailMjML } from '../../modules/emailService';
 import JobAgenda from '../../modules/jobService';
 import moment from 'moment';
 import mongoose, { ClientSession } from 'mongoose';
 import { randomUUID } from 'crypto';
-import { sendMailQueue } from '../../../config/bull';
+import { processBull, sendMailQueue } from '../../../config/bull';
 import Bull, { DoneCallback } from 'bull';
 import { myDataSource } from '../../../config/conenctTypeORM';
 import { Event } from '../../../model/typeorm/mysql/Event';
@@ -93,7 +93,7 @@ export const createVoucherMongoose = async (data: object) => {
       await createVoucherMongoose(data);
     } else {
       await session.abortTransaction();
-      throw new Error(error);
+      throw new Error(RESPONSES.BAD_REQUEST.MORE_THAN_ONE_10_VOUCHER);
     }
   } finally {
     await session.endSession();
@@ -113,7 +113,7 @@ export const updateOneVoucherMongoose = async (data) => {
 };
 
 export const runCronJobAll = async () => {
-  await cronJobSendEmailVoucher();
+  // await cronJobSendEmailVoucher();
   // await sendMailExample();
 };
 
@@ -197,17 +197,7 @@ export const cronJobSendEmailVoucher = async () => {
       },
     },
   );
-  sendMailQueue.on('waiting', (job, result) => {
-    console.log(`Job waiting with jod id ${job.id} result ${result}`);
-  });
-
-  sendMailQueue.on('active', (job, result) => {
-    console.log(`Job active with jod id ${job.id} result ${result}`);
-  });
-
-  sendMailQueue.on('completed', (job, result) => {
-    console.log(`Job completed with jod id ${job.id} result ${result}`);
-  });
+  processBull(sendMailQueue);
 };
 
 export const sendEmailStartSaleVoucher = async (job: Bull.Job<SendEmailVoucherBull>) => {
@@ -248,8 +238,8 @@ export default class VoucherService extends BaseService<typeof Voucher> {
     this.jobService = new JobAgenda();
   }
   runAllJob = async () => {
-    // await this.cronjobSendMailStartSaleVoucher();
-    // await this.cronjobSendMailEndSaleVoucher();
+    await this.cronjobSendMailStartSaleVoucher();
+    await this.cronjobSendMailEndSaleVoucher();
   };
   cronjobSendMailStartSaleVoucher = async () => {
     const userAll = await UserMongo.find();
@@ -272,21 +262,7 @@ export default class VoucherService extends BaseService<typeof Voucher> {
     await job.save();
     await agenda.start();
 
-    agenda.on('start', (job) => {
-      console.log('Job %s starting', job.attrs.name);
-    });
-
-    agenda.on('complete', (job) => {
-      console.log(`Job ${job.attrs.name} finished`);
-    });
-
-    agenda.on('success:send email start sale voucher', (job) => {
-      console.log(`Sent Email Successfully to ${job.attrs.data.to}`);
-    });
-
-    agenda.on('fail:send email start sale voucher', (err) => {
-      console.log(`Job failed with error: ${err.message}`);
-    });
+    processAgenda(agenda, 'send email start sale voucher');
   };
   cronjobSendMailEndSaleVoucher = async () => {
     const userAll = await UserMongo.find();
@@ -309,30 +285,15 @@ export default class VoucherService extends BaseService<typeof Voucher> {
     await job.save();
     await agenda.start();
 
-    agenda.on('start', (job) => {
-      console.log('Job %s starting', job.attrs.name);
-    });
-
-    agenda.on('complete', (job) => {
-      console.log(`Job ${job.attrs.name} finished`);
-    });
-
-    agenda.on('success:send email end sale voucher', (job) => {
-      console.log(`Sent Email Successfully to ${job.attrs.data.to}`);
-    });
-
-    agenda.on('fail:send email end sale voucher', (err) => {
-      console.log(`Job failed with error: ${err.message}`);
-    });
+    processAgenda(agenda, 'send email end sale voucher');
   };
   sendMailStartSaleVoucher = async (job: Job<SendMailContaxt>) => {
     const to = job.attrs.data.to;
     const nowMoment: string = moment().format('YYYY-MM-DD HH:mm');
     const voucherAll = await VoucherMongo.find({ startTimeAt: { $eq: nowMoment } });
-    let count = 0;
-    while (count < voucherAll.length) {
-      await handlerEmail(to, `Bắt đầu khuyến mãi nhanh tay lên nào`);
-      count += 1;
+
+    for (const voucherItem of voucherAll) {
+      await handlerEmailMjML(to, voucherItem);
     }
   };
   sendMailEndSaleVoucher = async (job: Job<SendMailContaxt>) => {
@@ -351,10 +312,8 @@ export default class VoucherService extends BaseService<typeof Voucher> {
         },
       },
     ]);
-    let count = 0;
-    while (count < voucherAll.length) {
-      await handlerEmail(to, `Còn 30 phút nữa hết khuyến mãi`);
-      count += 1;
+    for (const voucherItem of voucherAll) {
+      await handlerEmailMjML(to, voucherItem);
     }
   };
   //Restful APIs

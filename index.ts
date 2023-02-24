@@ -48,7 +48,7 @@ dbConnect();
 connectSql();
 connectPostgresql();
 connectApolloServer();
-cronJobApp();
+// cronJobApp();
 
 const swaggerFile = process.cwd() + '/swagger/swagger.json';
 const swaggerData = fs.readFileSync(swaggerFile, 'utf8');

@@ -18,7 +18,7 @@ voucherRouter.put('/updateVoucher', updateVoucherController);
 voucherRouter.post('/create-voucher', voucherController.createController);
 voucherRouter.put('/update-voucher', voucherController.updatePutController);
 voucherRouter.patch('/update-voucher', voucherController.updatePathController);
-voucherRouter.get('/get-list-voucher/:skip/:take', voucherController.readListController);
+voucherRouter.get('/get-list-voucher/:limit/:offset', voucherController.readListController);
 voucherRouter.get('/get-one-voucher/:id', voucherController.readOneController);
 voucherRouter.delete('/delete-voucher', voucherController.deleteController);
 voucherRouter.post('/:id/editable/me', voucherController.editVoucherByMe);

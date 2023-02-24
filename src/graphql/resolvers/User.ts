@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
-import { Mutation, Resolver, Arg } from 'type-graphql';
+import { Mutation, Resolver, Arg, Query } from 'type-graphql';
 import { Repository } from 'typeorm';
 import {
   hashPassword,
@@ -9,6 +9,7 @@ import {
 } from '../../apis/modules/jwtService';
 import { User } from '../../model/typeorm/postgressql';
 import {
+  GetOneUserGraphqlType,
   LoginResponse,
   LoginUserGraphqlType,
   LogoutUserGraphqlType,
@@ -135,5 +136,17 @@ export class UserResolver {
       statusCode: StatusCodes.OK,
       message: 'Logout successfully!',
     };
+  }
+
+  @Query((_return) => [User])
+  async getListUser(): Promise<User[]> {
+    return await this.reposity.find();
+  }
+
+  @Query((_return) => User)
+  async getOneUser(
+    @Arg('getOneUserGraphqlType') getOneUserGraphqlType: GetOneUserGraphqlType,
+  ): Promise<User> {
+    return await this.reposity.findOneBy({ id: getOneUserGraphqlType.id });
   }
 }

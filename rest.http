@@ -140,7 +140,7 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:8000/api-v1/voucher/get-list-voucher/2/1
+GET http://localhost:8000/api-v1/voucher/get-list-voucher/5/2
 
 ###
 GET http://localhost:8000/api-v1/voucher/get-one-voucher/bc653707-45e7-4e31-987b-7dfd7e2a76a5
