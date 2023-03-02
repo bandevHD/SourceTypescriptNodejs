@@ -2,11 +2,8 @@ require('reflect-metadata');
 require('express-async-errors');
 import express from 'express';
 import dotenv from 'dotenv';
-import morgan from 'morgan';
 // import helmet from 'helmet';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import apiCoreV1 from './src/apis/core_v1/routers/router';
+
 import swaggerUi from 'swagger-ui-express';
 import fs = require('fs');
 import { connectSql } from './src/config/conenctTypeORM';
@@ -17,6 +14,8 @@ import { connectApolloServer } from './src/config/connectApolloserver';
 import { cronJobApp } from './src/apis/core_v1/cronjob/job';
 import { RESPONSES } from './src/utils/HttpStatusResponseCode';
 import { graceful } from './src/config/agenda';
+import { createServer } from './server';
+import { gracefulBull } from './src/config/bull';
 
 // import crypto from 'crypto';
 // import YAML from 'yamljs';
@@ -29,25 +28,13 @@ import { graceful } from './src/config/agenda';
 
 dotenv.config();
 
-const app = express();
-app.use(morgan('common'));
-app.enable('trust proxy');
-app.use(
-  cors({
-    origin: '*',
-  }),
-);
-
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-// app.use(bodyParser({ extended: false }));
-app.use(bodyParser.json());
+const app = createServer();
 
 //Connect db mongodb, mysql, postgresql
 dbConnect();
 connectSql();
-connectPostgresql();
-connectApolloServer();
+// connectPostgresql();
+// connectApolloServer();
 // cronJobApp();
 
 const swaggerFile = process.cwd() + '/swagger/swagger.json';
@@ -55,7 +42,7 @@ const swaggerData = fs.readFileSync(swaggerFile, 'utf8');
 const swaggerDocument = JSON.parse(swaggerData);
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.static(__dirname + '/public'));
-app.use('/api-v1', apiCoreV1);
+
 //handle error internal server
 app.use((err, req, res, next) => {
   return res.status(RESPONSES.INTERNAL_SERVER_ERROR.CODE).json({
@@ -70,13 +57,13 @@ app.use((req, res) => {
     .status(RESPONSES.NOT_FOUND.CODE)
     .json({ messageCode: RESPONSES.NOT_FOUND.API_NOT_FOUND });
 });
+
+process.on('SIGINT', gracefulBull);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server runing at ${PORT}`);
 });
-
-process.on('SIGTERM', graceful);
-process.on('SIGINT', graceful);
 
 // process.on('SIGTERM', agendaDrain);
 // process.on('SIGINT', agendaDrain);

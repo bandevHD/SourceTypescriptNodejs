@@ -5,7 +5,7 @@ Content-Type: application/json
 {
     "firstName": "Ban",
     "lastName": "Tran",
-    "email": "trannhatban34@gmail.com",
+    "email": "tranban5@gmail.com",
     "password": "abc123"
 }
 
@@ -85,7 +85,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5YWFlZ
 POST http://localhost:8000/api-v1/user/me6e4515ae-4227-47b9-a98f-711963bad4db/editable/me
 
 ###Apis Voucher mongodb
-POST http://localhost:8000/api-v1/voucher/createVoucher
+POST http://localhost:8000/api-v1/voucher/createVoucherTransaction
 Content-Type: application/json
 
 {
@@ -101,11 +101,27 @@ Content-Type: application/json
 }
 
 ###
+POST http://localhost:8000/api-v1/voucher/createVoucher
+Content-Type: application/json
+
+{
+    "title": "Giảm giá khuyến mãi ngày valentine 2",
+    "content": "Ok",
+    "description": "Ok",
+    "discount": "1233",
+    "quantity": 12,
+    "startTimeAt": "2023-02-20 23:34",
+    "endTimeAt": "2023-02-20 23:23",
+    "isInactive": "false",
+     "isDelete": "false"
+}
+
+###
 PUT http://localhost:8000/api-v1/voucher/updateVoucher
 Content-Type: application/json
 
 {
-    "_id": "63f745ec6bd17872ce704dd7",
+    "_id": "64000d41816d5767f96b6c98",
     "title": "Giảm giá khuyến mãi ngày 24-2-2023",
     "content": "Ok",
     "description": "Ok",
@@ -118,10 +134,19 @@ Content-Type: application/json
 }
 
 ###
+PATCH http://localhost:8000/api-v1/voucher/updateVoucher
+Content-Type: application/json
+
+{
+    "_id": "63f745ec6bd17872ce704dd7",
+    "title": "Giảm giá khuyến mãi ngày 24-2-2023"
+}
+
+###
 GET  http://localhost:8000/api-v1/voucher/getListVoucher
 
 ###
-GET  http://localhost:8000/api-v1/voucher/getOneVoucher/63f745ec6bd17872ce704dd7
+GET  http://localhost:8000/api-v1/voucher/getOneVoucher/13ff1fd61cbfc30d27979b95
 
 ###RESTFUL api
 POST http://localhost:8000/api-v1/voucher/create-voucher
@@ -170,4 +195,29 @@ Content-Type: application/json
     "id": "bc653707-45e7-4e31-987b-7dfd7e2a76a5"
 }
 
+###
+POST http://localhost:8000/api-v1/events/63f745ec6bd17872ce704dd7/editable/me
+Content-Type: application/json
 
+{
+    "userId": "63ff08b218fedc204ba4d29d",
+    "typeEvent": "voucher"
+}
+
+###
+POST http://localhost:8000/api-v1/events/63f745ec6bd17872ce704dd7/editable/release
+Content-Type: application/json
+
+{
+    "userId": "63f6c237a0eea43f3764dfde",
+    "typeEvent": "voucher"
+}
+
+###
+POST http://localhost:8000/api-v1/events/63f745ec6bd17872ce704dd7/editable/maintain
+Content-Type: application/json
+
+{
+    "userId": "63f6c237a0eea43f3764dfde",
+    "typeEvent": "voucher"
+}

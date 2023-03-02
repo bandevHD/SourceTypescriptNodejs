@@ -3,6 +3,7 @@ import { User } from '../model/typeorm/postgressql';
 import { InterfaceType, Field, InputType, ObjectType } from 'type-graphql';
 import { Job, JobAttributesData } from 'agenda';
 import { JwtPayload } from 'jsonwebtoken';
+import Queue from 'bull';
 
 export type CreateUserType = {
   email: string;
@@ -200,3 +201,5 @@ export type job = { job: Job<JobAttributesData> };
 export type Processor<JobAttributes> =
   | ((job: Job<JobAttributes>) => Promise<void>)
   | ((job: Job<JobAttributes>, done: () => void) => void);
+
+export type queue = Queue.Queue<any>;

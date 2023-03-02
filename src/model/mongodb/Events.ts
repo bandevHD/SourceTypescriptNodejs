@@ -9,7 +9,6 @@ const eventSchema = new mongoose.Schema(
     },
     maxiMumQuantity: {
       type: Number,
-      requied: true,
     },
   },
   { timestamps: {} },

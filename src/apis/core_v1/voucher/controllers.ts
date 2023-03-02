@@ -1,8 +1,12 @@
 import VoucherService, {
   createVoucherMongoose,
+  createVoucherMongooseWithTransaction,
+  createVoucherTest,
+  deleteVoucherMongoose,
   getListVoucherMongoose,
   getOneVoucherMongoose,
   updateOneVoucherMongoose,
+  updatePatchVoucherMongoose,
 } from './services';
 import { NextFunction, Request, Response } from 'express';
 import { createValidate } from './dto/create.input';
@@ -16,8 +20,21 @@ export const createVoucherMongooseController = async (req: Request, res: Respons
   try {
     const time = new Date().getTime();
     console.log(`Time request-----------${time}`);
-    const data = await createVoucherMongoose(req.body);
+    const data = await createVoucherMongooseWithTransaction(req.body);
     res.status(StatusCodes.OK).json({
+      statusCode: StatusCodes.OK,
+      message: 'Tạo voucher thành công',
+      data,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const createVoucherController = async (req: Request, res: Response) => {
+  try {
+    const data = await createVoucherTest(req.body);
+    return res.status(StatusCodes.OK).json({
       statusCode: StatusCodes.OK,
       message: 'Tạo voucher thành công',
       data,
@@ -43,7 +60,11 @@ export const getOneVoucherMongooseController = async (req: Request, res: Respons
   try {
     const { id } = req.params;
     const data = await getOneVoucherMongoose(id);
-    res.status(RESPONSES.OK.CODE).json({
+    if (!data)
+      return res.status(RESPONSES.NOT_FOUND.CODE).json({
+        statusCode: RESPONSES.NOT_FOUND.VOUCHER_NOT_FOUND,
+      });
+    return res.status(RESPONSES.OK.CODE).json({
       statusCode: RESPONSES.OK.GET_ONE_VOUCHER_SUCCESS,
       data,
     });
@@ -54,6 +75,7 @@ export const getOneVoucherMongooseController = async (req: Request, res: Respons
 
 export const updateVoucherController = async (req: Request, res: Response) => {
   try {
+    console.log(req.body);
     const data = await updateOneVoucherMongoose(req.body);
     if (_.isNull(data)) {
       return res.status(RESPONSES.NOT_FOUND.CODE).json({
@@ -62,6 +84,41 @@ export const updateVoucherController = async (req: Request, res: Response) => {
     }
     res.status(RESPONSES.OK.CODE).json({
       statusCode: RESPONSES.OK.UPDATE_VOUCHER_SUCCESS,
+      data,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const updateVoucherPatchController = async (req: Request, res: Response) => {
+  try {
+    const data = await updatePatchVoucherMongoose(req.body);
+    if (_.isNull(data)) {
+      return res.status(RESPONSES.NOT_FOUND.CODE).json({
+        statusCode: RESPONSES.NOT_FOUND.VOUCHER_NOT_FOUND,
+      });
+    }
+    res.status(RESPONSES.OK.CODE).json({
+      statusCode: RESPONSES.OK.UPDATE_VOUCHER_SUCCESS,
+      data,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const deleteVoucherController = async (req: Request, res: Response) => {
+  try {
+    const { _id } = req.body;
+    const data = await deleteVoucherMongoose(_id);
+    if (_.isNull(data)) {
+      return res.status(RESPONSES.NOT_FOUND.CODE).json({
+        statusCode: RESPONSES.NOT_FOUND.VOUCHER_NOT_FOUND,
+      });
+    }
+    res.status(RESPONSES.OK.CODE).json({
+      statusCode: RESPONSES.OK.DELETE_VOUCHER_SUCCESS,
       data,
     });
   } catch (error) {

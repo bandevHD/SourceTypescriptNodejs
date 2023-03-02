@@ -32,3 +32,5 @@ export const contentEndSaleEmailVoucher = (voucher) => ({
   CONTENT: `${voucher.content}`,
   COUNTDOWN: `Còn 30 phút nữa hết khuyến mãi của voucher này! Nhanh tay lên nào`,
 });
+
+export const experiAtEX: number = 365 * 24 * 60 * 60;

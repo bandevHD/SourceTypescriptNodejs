@@ -22,7 +22,7 @@ module.exports = {
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'warn',
     // '@typescript-eslint/no-inferrable-types': [],
-    // 'eslint prefer-const': ["error", {"destructuring": "all"}]
+    // 'eslint prefer-const': ["error", {"destructuring": "all"}],
     // 'eslint prefer-const': ['error', {ignoreReadBeforeAssign: false}],
     // "no-console": "error"
   },

@@ -1,7 +1,7 @@
 import Agenda from 'agenda';
 
 export const agenda = new Agenda({
-  db: { address: process.env.MONGGODB_URI },
+  db: { address: process.env.MONGODB_ATLAS },
   processEvery: '30 seconds',
 });
 

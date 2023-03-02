@@ -23,12 +23,14 @@ import bcrypt from 'bcrypt';
 import { refreshValidate } from '../../apis/core_v1/user/dto/refreshToken.input';
 import redis from '../../config/connectRedis';
 import { logoutValidate } from '../../apis/core_v1/user/dto/logout.input';
+import { experiAtEX } from '../../utils/constant';
 @Resolver()
 export class UserResolver {
   private readonly reposity: Repository<User>;
   constructor() {
     this.reposity = myDataSourcePostgres.getRepository(User);
   }
+
   @Mutation((_return) => UserResponse)
   async register(
     @Arg('registerUserType') registerUserType: RegisterUserType,
@@ -103,7 +105,7 @@ export class UserResolver {
 
     redis.del(userId);
     await redis.set(userId, refreshTokenResult, {
-      EX: 365 * 24 * 60 * 60,
+      EX: experiAtEX,
       NX: true,
     });
     return {

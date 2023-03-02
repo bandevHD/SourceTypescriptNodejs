@@ -39,6 +39,8 @@ export async function register(req: Request, res: Response, next: NextFunction) 
 
     const isUserExits = await UserMongo.findOne({ email });
 
+    console.log(isUserExits);
+
     if (isUserExits) {
       return res.status(RESPONSES.CONFLICT.CODE).json({
         statusCode: RESPONSES.CONFLICT.EMAIL_EXIST,
@@ -56,7 +58,10 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     const html = 'Bạn đã đăng ký tài khoản thành công';
     await handlerEmail(email, html);
 
-    return saveUser;
+    return res.status(200).send({
+      statusCode: RESPONSES.OK.REGISTER_SUCCESS,
+      data: saveUser,
+    });
   } catch (error) {
     next(error);
   }

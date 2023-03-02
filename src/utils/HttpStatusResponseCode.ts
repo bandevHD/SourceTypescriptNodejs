@@ -13,6 +13,10 @@ export const RESPONSES = {
     GET_LIST_VOUCHER_SUCCESS: '200g',
     GET_ONE_VOUCHER_SUCCESS: '200h',
     UPDATE_VOUCHER_SUCCESS: '200i',
+    ALLOWED_ACCESS_EDIT_EVENT: '200j',
+    RELEASE_EDITTABLE_EVENT: '200k',
+    MAINTAIN_EDITTABLE_EVENT_SUCCESS: '200l',
+    DELETE_VOUCHER_SUCCESS: '200m',
   },
 
   //Client error responses
@@ -30,11 +34,13 @@ export const RESPONSES = {
     API_NOT_FOUND: '404a',
     USER_NOT_FOUND: '404b',
     VOUCHER_NOT_FOUND: '404c',
+    EVENT_NOT_FOUND: '404d',
   },
 
   UNAUTHORIZED: {
     CODE: StatusCodes.UNAUTHORIZED,
     PASSWORD_NOT_CORRECT: '401a',
+    NOT_ALLOWED_EDIT_EVENT: '401b',
   },
 
   FORBIDDEN: {
@@ -44,6 +50,7 @@ export const RESPONSES = {
   CONFLICT: {
     CODE: StatusCodes.CONFLICT,
     EMAIL_EXIST: '409a',
+    NOT_ALLOWED_ACCESS_EDIT_EVENT: '409b',
   },
 
   //server error responses

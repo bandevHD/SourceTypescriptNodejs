@@ -6,6 +6,7 @@ import {
   CreateVoucherType,
   DeleteBaseType,
   PaginationType,
+  queue,
   ReadOneVoucherType,
   SendEmailVoucherBull,
   SendMailContaxt,
@@ -22,7 +23,7 @@ import moment from 'moment';
 import mongoose, { ClientSession } from 'mongoose';
 import { randomUUID } from 'crypto';
 import { processBull, sendMailQueue } from '../../../config/bull';
-import Bull, { DoneCallback } from 'bull';
+import Bull, { DoneCallback, Queue } from 'bull';
 import { myDataSource } from '../../../config/conenctTypeORM';
 import { Event } from '../../../model/typeorm/mysql/Event';
 import { Response } from 'express';
@@ -37,11 +38,91 @@ import {
 dotenv.config();
 
 const { MONGODB_ATLAS } = process.env;
-export const createVoucherMongoose = async (data: object) => {
-  let maxiMumQuantity = 1;
-  let saveVoucher = null;
+
+const runTransactionWithRetry = async (txnFunc, session: ClientSession, data: object) => {
+  while (true) {
+    try {
+      await txnFunc(data, session);
+      break;
+    } catch (error) {
+      if (
+        error.hasOwnProperty('errorLabels') &&
+        error.errorLabels.includes('TransientTransactionError')
+      ) {
+        console.info('TransientTransactionError, retrying transaction ...');
+        continue;
+      } else {
+        throw error;
+      }
+    }
+  }
+};
+
+const commitWithRetry = async (session: ClientSession) => {
+  while (true) {
+    try {
+      await session.commitTransaction();
+      console.log('Transaction committed.');
+      break;
+    } catch (error) {
+      // Can retry commit
+      if (
+        error.hasOwnProperty('errorLabels') &&
+        error.errorLabels.includes('UnknownTransactionCommitResult')
+      ) {
+        console.log('UnknownTransactionCommitResult, retrying commit operation ...');
+        continue;
+      } else {
+        console.log('Error during commit ...');
+        throw error;
+      }
+    }
+  }
+};
+
+export const createVoucher = async (data: object, session?: ClientSession) => {
   const codeVoucher: string = randomUUID();
-  const conn = await mongoose.connect(MONGODB_ATLAS);
+  session.startTransaction({
+    readConcern: { level: 'snapshot' },
+    writeConcern: { w: 'majority' },
+  });
+
+  try {
+    const count: number = await VoucherMongo.count();
+    if (count >= 10) throw '';
+    const voucher = new VoucherMongo({ ...data, code: codeVoucher });
+    await voucher.save({ session });
+    await EventMongo.findOneAndUpdate(
+      { typeEvent: 'voucher' },
+      { $inc: { maxiMumQuantity: 1 } },
+      {
+        session,
+        new: true,
+        upsert: true,
+      },
+    );
+    // return saveVoucher;
+  } catch (error) {
+    await session.abortTransaction();
+    throw RESPONSES.BAD_REQUEST.MORE_THAN_ONE_10_VOUCHER;
+  }
+  await commitWithRetry(session);
+};
+export const createVoucherMongooseWithTransaction = async (data: object) => {
+  const conn: typeof mongoose = await mongoose.connect(MONGODB_ATLAS);
+  const session: ClientSession = await conn.startSession();
+  try {
+    await runTransactionWithRetry(createVoucher, session, data);
+  } catch (error) {
+    throw new Error(error);
+  } finally {
+    await session.endSession();
+  }
+};
+
+export const createVoucherMongoose = async (data: object) => {
+  const codeVoucher: string = randomUUID();
+  const conn: typeof mongoose = await mongoose.connect(MONGODB_ATLAS);
   const session: ClientSession = await conn.startSession();
   session.startTransaction({
     readPreference: 'primary',
@@ -51,36 +132,16 @@ export const createVoucherMongoose = async (data: object) => {
 
   try {
     const voucher = new VoucherMongo({ ...data, code: codeVoucher });
-    saveVoucher = await voucher.save({ session });
-    const eventFineOne = await EventMongo.findOne(
+    const saveVoucher = await voucher.save({ session });
+    await EventMongo.findOneAndUpdate(
+      { typeEvent: 'voucher' },
+      { $inc: { maxiMumQuantity: 1 } },
       {
-        typeEvent: 'voucher',
-        maxiMumQuantity: { $lte: 10 },
+        session,
+        new: true,
+        upsert: true,
       },
-      null,
     );
-
-    if (_.isNull(eventFineOne)) {
-      const eventCreare = new EventMongo({ typeEvent: 'voucher', maxiMumQuantity: 1 });
-      await eventCreare.save({ session });
-    }
-
-    if (_.isNull(eventFineOne) == false && eventFineOne.maxiMumQuantity < 10) {
-      maxiMumQuantity = eventFineOne.maxiMumQuantity + 1;
-
-      await EventMongo.updateOne({ typeEvent: 'voucher' }, { maxiMumQuantity }, { session });
-    } else if (_.isNull(eventFineOne) == false && eventFineOne.maxiMumQuantity >= 10) {
-      throw 'Vượt quá 10 voucher';
-    }
-    // await EventMongo.findOneAndUpdate(
-    //   { typeEvent: 'voucher' },
-    //   { maxiMumQuantity },
-    //   {
-    //     session,
-    //     new: true,
-    //     upsert: true,
-    //   },
-    // );
 
     await session.commitTransaction();
     return saveVoucher;
@@ -100,133 +161,241 @@ export const createVoucherMongoose = async (data: object) => {
   }
 };
 
+export const createVoucherTest = async (data: object) => {
+  const codeVoucher: string = randomUUID();
+  try {
+    const voucher = new VoucherMongo({ ...data, code: codeVoucher });
+    const saveVoucher = await voucher.save();
+    await EventMongo.findOneAndUpdate(
+      { typeEvent: 'voucher' },
+      { $inc: { maxiMumQuantity: 1 } },
+      {
+        new: true,
+        upsert: true,
+      },
+    );
+    return saveVoucher;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const getListVoucherMongoose = async () => {
   return await VoucherMongo.find();
 };
 
 export const getOneVoucherMongoose = async (_id: string) => {
-  return await VoucherMongo.findOne({ _id });
+  try {
+    return await VoucherMongo.findById({ _id });
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 export const updateOneVoucherMongoose = async (data) => {
+  return await VoucherMongo.findByIdAndUpdate(data._id, data);
+};
+
+export const updatePatchVoucherMongoose = async (data) => {
   return await VoucherMongo.findOneAndUpdate({ _id: data._id }, data);
 };
 
+export const deleteVoucherMongoose = async (id: string) => {
+  return await VoucherMongo.findByIdAndUpdate(id, { isDelete: true });
+};
+
 export const runCronJobAll = async () => {
-  // await cronJobSendEmailVoucher();
+  await cronJobSendEmailVoucher();
   // await sendMailExample();
 };
 
 export const sendMailExample = async () => {
-  const voucherOne = await VoucherMongo.findOne();
-  sendMailQueue.process(
-    'sendEmail',
-    25,
-    async (job: Bull.Job<SendEmailVoucherBull>, done: DoneCallback) => {
-      await handlerEmailMjML(job.data.to, contentEmailVoucher(voucherOne));
+  try {
+    const voucherOne = await VoucherMongo.findOne();
+    sendMailQueue.process(
+      'sendEmail',
+      25,
+      async (job: Bull.Job<SendEmailVoucherBull>, done: DoneCallback) => {
+        await handlerEmailMjML(job.data.to, contentEmailVoucher(voucherOne));
 
-      done();
-    },
-  );
-
-  await sendMailQueue.add(
-    'sendEmail',
-    { to: `bant835@gmail.com` },
-    {
-      repeat: {
-        every: 10000,
-        limit: 10,
+        done();
       },
-    },
-  );
+    );
 
-  sendMailQueue.on('waiting', (job, result) => {
-    console.log(`Job waiting with jod id ${job.id} result ${result}`);
-  });
-
-  sendMailQueue.on('active', (job, result) => {
-    console.log(`Job active with jod id ${job.id} result ${result}`);
-  });
-
-  sendMailQueue.on('completed', (job, result) => {
-    console.log(`Job completed with jod id ${job.id} result ${result}`);
-  });
-
-  await sendMailQueue.clean(5000);
-};
-
-export const cronJobSendEmailVoucher = async () => {
-  const userAll = await UserMongo.find();
-  const emailArray = userAll.map((result) => result.email);
-  // console.log(emailArray)
-  sendMailQueue.process(
-    'sendEmailStartSalevoucher',
-    25,
-    async (job: Bull.Job<SendEmailVoucherBull>, done: DoneCallback) => {
-      await sendEmailStartSaleVoucher(job);
-
-      done();
-    },
-  );
-  sendMailQueue.process(
-    'sendEmailEndSalevoucher',
-    25,
-    async (job: Bull.Job<SendEmailVoucherBull>, done: DoneCallback) => {
-      await sendEmailEndSaleVoucher(job);
-
-      done();
-    },
-  );
-  await sendMailQueue.add(
-    'sendEmailStartSalevoucher',
-    { to: `${emailArray.toString()}` },
-    {
-      repeat: {
-        every: 10000,
-        limit: 100,
+    await sendMailQueue.add(
+      'sendEmail',
+      { to: `bant835@gmail.com` },
+      {
+        repeat: {
+          every: 10000,
+          limit: 10,
+        },
       },
-    },
-  );
-  await sendMailQueue.add(
-    'sendEmailEndSalevoucher',
-    { to: `${emailArray.toString()}` },
-    {
-      repeat: {
-        every: 10000,
-        limit: 100,
-      },
-    },
-  );
-  processBull(sendMailQueue);
-};
+    );
 
-export const sendEmailStartSaleVoucher = async (job: Bull.Job<SendEmailVoucherBull>) => {
-  const to: string = job.data.to;
-  const nowMoment: string = moment().format('YYYY-MM-DD HH:mm');
-  const voucherAll = await VoucherMongo.find({ startTimeAt: { $eq: nowMoment } });
-  for (const voucher of voucherAll) {
-    await handlerEmailMjML(to, contentStartSaleEmailVoucher(voucher));
+    sendMailQueue.on('waiting', (job, result) => {
+      console.log(`Job waiting with jod id ${job.id} result ${result}`);
+    });
+
+    sendMailQueue.on('active', (job, result) => {
+      console.log(`Job active with jod id ${job.id} result ${result}`);
+    });
+
+    sendMailQueue.on('completed', (job, result) => {
+      console.log(`Job completed with jod id ${job.id} result ${result}`);
+    });
+
+    await sendMailQueue.clean(5000);
+  } catch (error) {
+    throw new Error(error);
   }
 };
 
-export const sendEmailEndSaleVoucher = async (job: Bull.Job<SendEmailVoucherBull>) => {
-  const to = job.data.to;
-  const voucherAll = await VoucherMongo.aggregate([
-    { $match: { timediff: { $eq: 30 } } },
-    {
-      $project: {
-        timediff: {
-          $dateDiff: {
-            startDate: { $toDate: '$startTimeAt' },
-            endDate: new Date(),
-            unit: 'minute',
+export const cronJobSendEmailVoucher = async () => {
+  try {
+    const userAll = await UserMongo.find();
+    const emailArray = userAll.map((result) => result.email);
+    // sendMailQueue.process(
+    //   'sendEmailStartSalevoucher',
+    //   25,
+    //   async (job: Bull.Job<SendEmailVoucherBull>, done: DoneCallback) => {
+    //     console.log(`Processing Job-${job.id} Attempt: ${job.attemptsMade}`);
+    //     await sendEmailStartSaleVoucher(job, async (error) => {
+    //       console.log('error', error);
+    //       if (error) {
+    //         console.log('error', error);
+    //         await repeatJobSendEmailStartSaleVoucher(sendMailQueue, job, done);
+    //       } else done();
+    //     });
+    //   },
+    // );
+    sendMailQueue.process(
+      'sendEmailEndSalevoucher',
+      25,
+      async (job: Bull.Job<SendEmailVoucherBull>, done: DoneCallback) => {
+        try {
+          await sendEmailEndSaleVoucher(job, async (error) => {
+            console.log(error);
+            if (error) await repeatJobSendEmailEndSaleVoucher(sendMailQueue, job, done);
+            else done();
+          });
+        } catch (error) {
+          throw error;
+        }
+      },
+    );
+    // await sendMailQueue.add(
+    //   'sendEmailStartSalevoucher',
+    //   { to: `${emailArray.toString()}` },
+    //   {
+    //     repeat: {
+    //       every: 10000,
+    //       limit: 100,
+    //     },
+    //   },
+    // );
+    await sendMailQueue.add(
+      'sendEmailEndSalevoucher',
+      { to: `${emailArray.toString()}` },
+      {
+        repeat: {
+          every: 600000,
+          limit: 100,
+        },
+        removeOnComplete: true,
+        removeOnFail: true,
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 1000,
+        },
+      },
+    );
+    processBull(sendMailQueue);
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const repeatJobSendEmailStartSaleVoucher = async (
+  queue: queue,
+  job: Bull.Job<SendEmailVoucherBull>,
+  done: DoneCallback,
+) => {
+  const newJob = await queue.add('sendEmailStartSalevoucher', job.data, {
+    repeat: {
+      every: 60000,
+      limit: 100,
+    },
+    priority: 1,
+    removeOnComplete: true,
+    removeOnFail: true,
+  });
+  console.log(`Job-${job.id} failed. Creating new Job-${newJob.id} with highest priority`);
+  done();
+};
+
+export const repeatJobSendEmailEndSaleVoucher = async (
+  queue: queue,
+  job: Bull.Job<SendEmailVoucherBull>,
+  done: DoneCallback,
+) => {
+  const newJob = await queue.add('sendEmailEndSalevoucher', job.data, {
+    repeat: {
+      every: 60000,
+      limit: 100,
+    },
+    priority: 1,
+    removeOnComplete: true,
+    removeOnFail: true,
+  });
+  console.log(`Job-${job.id} failed. Creating new Job-${newJob.id} with highest priority`);
+  done();
+};
+
+export const sendEmailStartSaleVoucher = async (
+  job: Bull.Job<SendEmailVoucherBull>,
+  done: DoneCallback,
+) => {
+  try {
+    const to: string = job.data.to;
+    const nowMoment: string = moment().format('YYYY-MM-DD HH:mm');
+    const voucherAll = await VoucherMongo.find({ startTimeAt: { $eq: nowMoment } });
+    for (const voucher of voucherAll) {
+      await handlerEmailMjML(to, contentStartSaleEmailVoucher(voucher));
+    }
+  } catch (error) {
+    done(error);
+    throw new Error(error);
+  }
+};
+
+export const sendEmailEndSaleVoucher = async (
+  job: Bull.Job<SendEmailVoucherBull>,
+  done: DoneCallback,
+) => {
+  try {
+    const to = job.data.to;
+    const voucherAll = await VoucherMongo.aggregate([
+      { $match: { timediff: { $eq: 30 } } },
+      {
+        $project: {
+          timediff: {
+            $dateDiff: {
+              startDate: { $toDate: '$startTimeAt' },
+              endDate: new Date(),
+              unit: 'minute',
+            },
           },
         },
       },
-    },
-  ]);
-  for (const voucher of voucherAll) {
-    await handlerEmailMjML(to, contentEndSaleEmailVoucher(voucher));
+    ]);
+    for (const voucher of voucherAll) {
+      await handlerEmailMjML(to, contentEndSaleEmailVoucher(voucher));
+    }
+    done({ name: 'Lỗi test', message: 'Lỗi test' });
+  } catch (error) {
+    throw new Error(error);
   }
 };
 
