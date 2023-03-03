@@ -75,7 +75,6 @@ export const getOneVoucherMongooseController = async (req: Request, res: Respons
 
 export const updateVoucherController = async (req: Request, res: Response) => {
   try {
-    console.log(req.body);
     const data = await updateOneVoucherMongoose(req.body);
     if (_.isNull(data)) {
       return res.status(RESPONSES.NOT_FOUND.CODE).json({
