@@ -17,13 +17,13 @@ import { BaseService } from '../../base/base_service';
 import { Voucher } from '../../../model/typeorm/mysql/index';
 import { agenda, processAgenda } from '../../../config/agenda';
 import { Job } from 'agenda';
-import { handlerEmail, handlerEmailMjML } from '../../modules/emailService';
+import { handlerEmailMjML } from '../../modules/emailService';
 import JobAgenda from '../../modules/jobService';
 import moment from 'moment';
 import mongoose, { ClientSession } from 'mongoose';
 import { randomUUID } from 'crypto';
 import { processBull, sendMailQueue } from '../../../config/bull';
-import Bull, { DoneCallback, Queue } from 'bull';
+import Bull, { DoneCallback } from 'bull';
 import { myDataSource } from '../../../config/conenctTypeORM';
 import { Event } from '../../../model/typeorm/mysql/Event';
 import { Response } from 'express';
@@ -33,6 +33,11 @@ import {
   contentEmailVoucher,
   contentEndSaleEmailVoucher,
   contentStartSaleEmailVoucher,
+  findVoucherAll,
+  nameJob,
+  optionJob,
+  optionRepeatJob,
+  priorityNumber,
 } from '../../../utils/constant';
 
 dotenv.config();
@@ -256,8 +261,8 @@ export const cronJobSendEmailVoucher = async () => {
     const userAll = await UserMongo.find();
     const emailArray = userAll.map((result) => result.email);
     // sendMailQueue.process(
-    //   'sendEmailStartSalevoucher',
-    //   25,
+    //   nameJob.sendEmailStartSalevoucher,
+    //   priorityNumber.priority25,
     //   async (job: Bull.Job<SendEmailVoucherBull>, done: DoneCallback) => {
     //     console.log(`Processing Job-${job.id} Attempt: ${job.attemptsMade}`);
     //     await sendEmailStartSaleVoucher(job, async (error) => {
@@ -270,12 +275,11 @@ export const cronJobSendEmailVoucher = async () => {
     //   },
     // );
     sendMailQueue.process(
-      'sendEmailEndSalevoucher',
-      25,
+      nameJob.sendEmailEndSalevoucher,
+      priorityNumber.priority25,
       async (job: Bull.Job<SendEmailVoucherBull>, done: DoneCallback) => {
         try {
           await sendEmailEndSaleVoucher(job, async (error) => {
-            console.log(error);
             if (error) await repeatJobSendEmailEndSaleVoucher(sendMailQueue, job, done);
             else done();
           });
@@ -295,21 +299,9 @@ export const cronJobSendEmailVoucher = async () => {
     //   },
     // );
     await sendMailQueue.add(
-      'sendEmailEndSalevoucher',
+      nameJob.sendEmailEndSalevoucher,
       { to: `${emailArray.toString()}` },
-      {
-        repeat: {
-          every: 600000,
-          limit: 100,
-        },
-        removeOnComplete: true,
-        removeOnFail: true,
-        attempts: 3,
-        backoff: {
-          type: 'exponential',
-          delay: 1000,
-        },
-      },
+      optionJob,
     );
     processBull(sendMailQueue);
   } catch (error) {
@@ -322,15 +314,7 @@ export const repeatJobSendEmailStartSaleVoucher = async (
   job: Bull.Job<SendEmailVoucherBull>,
   done: DoneCallback,
 ) => {
-  const newJob = await queue.add('sendEmailStartSalevoucher', job.data, {
-    repeat: {
-      every: 60000,
-      limit: 100,
-    },
-    priority: 1,
-    removeOnComplete: true,
-    removeOnFail: true,
-  });
+  const newJob = await queue.add(nameJob.sendEmailStartSalevoucher, job.data, optionRepeatJob);
   console.log(`Job-${job.id} failed. Creating new Job-${newJob.id} with highest priority`);
   done();
 };
@@ -340,15 +324,7 @@ export const repeatJobSendEmailEndSaleVoucher = async (
   job: Bull.Job<SendEmailVoucherBull>,
   done: DoneCallback,
 ) => {
-  const newJob = await queue.add('sendEmailEndSalevoucher', job.data, {
-    repeat: {
-      every: 60000,
-      limit: 100,
-    },
-    priority: 1,
-    removeOnComplete: true,
-    removeOnFail: true,
-  });
+  const newJob = await queue.add(nameJob.sendEmailEndSalevoucher, job.data, optionRepeatJob);
   console.log(`Job-${job.id} failed. Creating new Job-${newJob.id} with highest priority`);
   done();
 };
@@ -376,25 +352,13 @@ export const sendEmailEndSaleVoucher = async (
 ) => {
   try {
     const to = job.data.to;
-    const voucherAll = await VoucherMongo.aggregate([
-      { $match: { timediff: { $eq: 30 } } },
-      {
-        $project: {
-          timediff: {
-            $dateDiff: {
-              startDate: { $toDate: '$startTimeAt' },
-              endDate: new Date(),
-              unit: 'minute',
-            },
-          },
-        },
-      },
-    ]);
+    const voucherAll = await VoucherMongo.aggregate(findVoucherAll());
     for (const voucher of voucherAll) {
       await handlerEmailMjML(to, contentEndSaleEmailVoucher(voucher));
     }
-    done({ name: 'Lỗi test', message: 'Lỗi test' });
+    // done({ name: 'true', message: 'testloi' });
   } catch (error) {
+    done({ name: 'true', message: error });
     throw new Error(error);
   }
 };

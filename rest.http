@@ -200,7 +200,7 @@ POST http://localhost:8000/api-v1/events/63f745ec6bd17872ce704dd7/editable/me
 Content-Type: application/json
 
 {
-    "userId": "63ff08b218fedc204ba4d29d",
+    "userId": "63ff0734a8369721f9d64f8f",
     "typeEvent": "voucher"
 }
 
@@ -209,7 +209,7 @@ POST http://localhost:8000/api-v1/events/63f745ec6bd17872ce704dd7/editable/relea
 Content-Type: application/json
 
 {
-    "userId": "63f6c237a0eea43f3764dfde",
+    "userId": "63ff0734a8369721f9d64f8f",
     "typeEvent": "voucher"
 }
 
@@ -218,6 +218,6 @@ POST http://localhost:8000/api-v1/events/63f745ec6bd17872ce704dd7/editable/maint
 Content-Type: application/json
 
 {
-    "userId": "63f6c237a0eea43f3764dfde",
+    "userId": "63ff08b218fedc204ba4d29d",
     "typeEvent": "voucher"
 }

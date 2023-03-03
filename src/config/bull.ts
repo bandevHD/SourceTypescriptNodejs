@@ -8,7 +8,6 @@ export const sendMailQueue: Queue.Queue<any> = new Queue('send-mail-queue', {
 });
 
 export async function gracefulBull() {
-  await sendMailQueue.obliterate();
   await sendMailQueue.close();
   process.exit(0);
 }

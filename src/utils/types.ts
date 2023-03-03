@@ -4,6 +4,7 @@ import { InterfaceType, Field, InputType, ObjectType } from 'type-graphql';
 import { Job, JobAttributesData } from 'agenda';
 import { JwtPayload } from 'jsonwebtoken';
 import Queue from 'bull';
+import Bull from 'bull';
 
 export type CreateUserType = {
   email: string;
@@ -196,10 +197,12 @@ export type SendEmailVoucherBull = {
   to: string;
 };
 
-export type job = { job: Job<JobAttributesData> };
+export type job = Job<JobAttributesData>;
 
 export type Processor<JobAttributes> =
   | ((job: Job<JobAttributes>) => Promise<void>)
   | ((job: Job<JobAttributes>, done: () => void) => void);
 
 export type queue = Queue.Queue<any>;
+
+export type jobTypes = Bull.Job<SendEmailVoucherBull>;
