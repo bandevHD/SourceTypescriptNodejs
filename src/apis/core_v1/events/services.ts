@@ -17,10 +17,10 @@ dotenv.config();
 const { MONGODB_ATLAS } = process.env;
 
 export default class EventsService {
-  editTableByMe = async (data): Promise<string> => {
+  editVoucherByMe = async (data): Promise<string> => {
     try {
-      const findOneEvent = await EventUser.findOne(findOneEventConstant(data));
-      if (findOneEvent) return RESPONSES.CONFLICT.NOT_ALLOWED_ACCESS_EDIT_EVENT;
+      const findOneEvent = await EventUser.aggregate(aggregateFindConstant(data));
+      if (findOneEvent[0]['datediff'] < 5) return RESPONSES.CONFLICT.NOT_ALLOWED_ACCESS_EDIT_EVENT;
       await EventUser.findOneAndUpdate(
         findOneAndUpdateConstant(data),
         {
@@ -35,7 +35,7 @@ export default class EventsService {
     }
   };
 
-  editTableRelease = async (data): Promise<string> => {
+  editVoucherRelease = async (data): Promise<string> => {
     try {
       const findOneEvent: UpdateWriteOpResult = await EventUser.updateOne(
         updateOneEventConstant(data),
@@ -48,7 +48,7 @@ export default class EventsService {
     }
   };
 
-  editTableMaintain = async (data): Promise<string> => {
+  editVoucherMaintain = async (data): Promise<string> => {
     const conn = await mongoose.connect(MONGODB_ATLAS);
     const session: ClientSession = await conn.startSession();
     session.startTransaction({

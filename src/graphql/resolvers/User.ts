@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
-import { Mutation, Resolver, Arg, Query } from 'type-graphql';
+import { Mutation, Resolver, Arg, Query, FieldResolver, Root } from 'type-graphql';
 import { Repository } from 'typeorm';
 import {
   hashPassword,
@@ -7,7 +7,7 @@ import {
   signJwtRefreshToken,
   verifyRefreshToken,
 } from '../../apis/modules/jwtService';
-import { User } from '../../model/typeorm/postgressql';
+import { Phone, User } from '../../model/typeorm/postgressql';
 import {
   GetOneUserGraphqlType,
   LoginResponse,
@@ -24,11 +24,13 @@ import { refreshValidate } from '../../apis/core_v1/user/dto/refreshToken.input'
 import redis from '../../config/connectRedis';
 import { logoutValidate } from '../../apis/core_v1/user/dto/logout.input';
 import { experiAtEX } from '../../utils/constant';
-@Resolver()
+@Resolver((_of) => User)
 export class UserResolver {
   private readonly reposity: Repository<User>;
+  private readonly phoneReposity: Repository<Phone>;
   constructor() {
     this.reposity = myDataSourcePostgres.getRepository(User);
+    this.phoneReposity = myDataSourcePostgres.getRepository(Phone);
   }
 
   @Mutation((_return) => UserResponse)
@@ -150,5 +152,14 @@ export class UserResolver {
     @Arg('getOneUserGraphqlType') getOneUserGraphqlType: GetOneUserGraphqlType,
   ): Promise<User> {
     return await this.reposity.findOneBy({ id: getOneUserGraphqlType.id });
+  }
+
+  @FieldResolver((_returns) => [Phone])
+  async phone(@Root() user: User): Promise<Phone[]> {
+    try {
+      return await this.phoneReposity.find({ where: { userId: user.id } });
+    } catch (error) {
+      throw error;
+    }
   }
 }

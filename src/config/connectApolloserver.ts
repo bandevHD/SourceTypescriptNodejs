@@ -16,6 +16,7 @@ const app = express();
 const httpServer = createServer(app);
 export const connectApolloServer = async () => {
   const apolloServer = new ApolloServer({
+    // uploads: false,
     schema: await buildSchema({
       validate: false,
       resolvers: [Hello, UserResolver],

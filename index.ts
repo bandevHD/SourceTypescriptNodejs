@@ -33,10 +33,11 @@ const app = createServer();
 //Connect db mongodb, mysql, postgresql
 dbConnect();
 connectSql();
-// connectPostgresql();
-// connectApolloServer();
+connectPostgresql();
+connectApolloServer();
 // cronJobApp();
 
+// app.use(graphqlUploadExpress());
 const swaggerFile = process.cwd() + '/swagger/swagger.json';
 const swaggerData = fs.readFileSync(swaggerFile, 'utf8');
 const swaggerDocument = JSON.parse(swaggerData);
@@ -45,10 +46,16 @@ app.use(express.static(__dirname + '/public'));
 
 //handle error internal server
 app.use((err, req, res, next) => {
-  return res.status(RESPONSES.INTERNAL_SERVER_ERROR.CODE).json({
-    message: err.message,
-    messageCode: RESPONSES.INTERNAL_SERVER_ERROR.SOMETHING_WENT_WRONG,
-  });
+  return res
+    .status(
+      err.message && Number.isInteger(Number(err.message.slice(7, 10)))
+        ? Number(err.message.slice(7, 10))
+        : RESPONSES.INTERNAL_SERVER_ERROR.CODE,
+    )
+    .json({
+      statusCode: err.message.slice(7),
+      messageCode: RESPONSES.INTERNAL_SERVER_ERROR.SOMETHING_WENT_WRONG,
+    });
 });
 
 //handle api not found

@@ -1,5 +1,8 @@
 import Queue from 'bull';
-
+import cluster from 'cluster';
+import http from 'http';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const numCPUs = require('os').cpus().length;
 export const sendMailQueue: Queue.Queue<any> = new Queue('send-mail-queue', {
   limiter: {
     max: 1000,

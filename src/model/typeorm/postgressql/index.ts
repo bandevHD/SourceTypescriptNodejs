@@ -1,6 +1,7 @@
+import { Phone } from './phone';
 import { User } from './user';
 
-const entities = [User];
+const entities = [User, Phone];
 
 export default entities;
-export { User };
+export { User, Phone };

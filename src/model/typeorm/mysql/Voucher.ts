@@ -34,6 +34,7 @@ export class Voucher {
   @Column({ default: false })
   isDelete: boolean;
 
+ 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
   public created_at: Date;
 

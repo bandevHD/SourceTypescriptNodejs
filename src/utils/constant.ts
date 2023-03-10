@@ -122,3 +122,7 @@ export const optionRepeatJob = {
   removeOnComplete: true,
   removeOnFail: true,
 };
+
+export const typeEvent = {
+  voucher: 'voucher',
+};

@@ -27,7 +27,7 @@ class EnventsController {
       const timeEvent: Date = new Date();
       const idEvent: string = req.params.event_id;
       const ipAddress: string = req.header('x-forwarded-for') || req.connection.remoteAddress;
-      const result: string = await this.eventsService.editTableByMe({
+      const result: string = await this.eventsService.editVoucherByMe({
         ...req.body,
         idEvent,
         ipAddress,
@@ -45,7 +45,7 @@ class EnventsController {
   editTableReleaseController = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const idEvent: string = req.params.event_id;
-      const result: string = await this.eventsService.editTableRelease({
+      const result: string = await this.eventsService.editVoucherRelease({
         ...req.body,
         idEvent,
       });
@@ -61,7 +61,7 @@ class EnventsController {
     try {
       const idEvent: string = req.params.event_id;
       const timeEvent = new Date();
-      const result: string = await this.eventsService.editTableMaintain({
+      const result: string = await this.eventsService.editVoucherMaintain({
         ...req.body,
         idEvent,
         timeEvent,

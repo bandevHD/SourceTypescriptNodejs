@@ -38,6 +38,7 @@ import {
   optionJob,
   optionRepeatJob,
   priorityNumber,
+  typeEvent,
 } from '../../../utils/constant';
 
 dotenv.config();
@@ -93,8 +94,11 @@ export const createVoucher = async (data: object, session?: ClientSession) => {
   });
 
   try {
-    const count: number = await VoucherMongo.count();
-    if (count >= 10) throw '';
+    const result = await EventMongo.findOne({
+      typeEvent: typeEvent.voucher,
+      maxiMumQuantity: { $gte: 10 },
+    });
+    if (result) throw RESPONSES.BAD_REQUEST.MORE_THAN_ONE_10_VOUCHER;
     const voucher = new VoucherMongo({ ...data, code: codeVoucher });
     await voucher.save({ session });
     await EventMongo.findOneAndUpdate(
@@ -109,7 +113,7 @@ export const createVoucher = async (data: object, session?: ClientSession) => {
     // return saveVoucher;
   } catch (error) {
     await session.abortTransaction();
-    throw RESPONSES.BAD_REQUEST.MORE_THAN_ONE_10_VOUCHER;
+    throw error;
   }
   await commitWithRetry(session);
 };
